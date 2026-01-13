@@ -1,0 +1,119 @@
+<%= form_with model: expense, class: "space-y-6" do |f| %>
+  <% if expense.errors.any? %>
+    <div class="alert-error">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <h3 class="font-medium"><%= pluralize(expense.errors.count, "error") %> prohibited this expense from being saved:</h3>
+          <ul class="mt-2 list-disc list-inside text-sm">
+            <% expense.errors.each do |error| %>
+              <li><%= error.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="form-grid">
+    <%# Amount %>
+    <div class="input-group">
+      <%= f.label :amount, class: "input-label" %>
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+        <%= f.number_field :amount, step: 0.01, min: 0, placeholder: "0.00", class: "input pl-8" %>
+      </div>
+    </div>
+
+    <%# Spent On %>
+    <div class="input-group">
+      <%= f.label :spent_on, "Date", class: "input-label" %>
+      <%= f.date_field :spent_on, class: "input" %>
+    </div>
+
+    <%# Category %>
+    <div class="input-group">
+      <%= f.label :category, class: "input-label" %>
+      <div class="space-y-2">
+        <%= f.select :category, 
+            options_for_select(
+              Expense::CATEGORIES.map { |c| [c.capitalize, c] },
+              expense.category
+            ),
+            { include_blank: "Select category or type below" },
+            class: "select", id: "category-select" %>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-500">or</span>
+          <input type="text" 
+                 id="custom-category" 
+                 placeholder="Enter custom category"
+                 class="input text-sm py-2"
+                 data-controller="custom-category">
+        </div>
+      </div>
+    </div>
+
+    <%# Spent By %>
+    <div class="input-group">
+      <%= f.label :spent_by, class: "input-label" %>
+      <div class="flex gap-4">
+        <label class="flex items-center gap-3 p-4 rounded-xl border border-dark-border cursor-pointer hover:bg-dark-surface-elevated transition-colors flex-1">
+          <%= f.radio_button :spent_by, "self_expense", class: "w-4 h-4 text-primary-500 bg-dark-surface border-dark-border focus:ring-primary-500" %>
+          <div>
+            <span class="text-white font-medium">Self</span>
+            <p class="text-xs text-gray-500">Your expense</p>
+          </div>
+        </label>
+        <label class="flex items-center gap-3 p-4 rounded-xl border border-dark-border cursor-pointer hover:bg-dark-surface-elevated transition-colors flex-1">
+          <%= f.radio_button :spent_by, "wife", class: "w-4 h-4 text-secondary-500 bg-dark-surface border-dark-border focus:ring-secondary-500" %>
+          <div>
+            <span class="text-white font-medium">Wife</span>
+            <p class="text-xs text-gray-500">Wife's expense</p>
+          </div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <%# Note %>
+  <div class="input-group">
+    <%= f.label :note, class: "input-label" %>
+    <%= f.text_area :note, rows: 3, placeholder: "Add any additional details about this expense...", class: "textarea" %>
+  </div>
+
+  <%# Form Actions %>
+  <div class="form-actions border-t border-dark-border pt-6">
+    <%= f.submit expense.new_record? ? "Add Expense" : "Update Expense", class: "btn-primary btn-lg" %>
+    <%= link_to "Cancel", root_path, class: "btn-secondary btn-lg" %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('category-select');
+    const customCategory = document.getElementById('custom-category');
+    
+    if (customCategory && categorySelect) {
+      customCategory.addEventListener('input', function() {
+        if (this.value.trim() !== '') {
+          categorySelect.value = '';
+          categorySelect.name = '';
+          this.name = 'expense[category]';
+        }
+      });
+      
+      categorySelect.addEventListener('change', function() {
+        if (this.value !== '') {
+          customCategory.value = '';
+          customCategory.name = '';
+          this.name = 'expense[category]';
+        }
+      });
+      
+      // Set initial state
+      categorySelect.name = 'expense[category]';
+    }
+  });
+</script>
