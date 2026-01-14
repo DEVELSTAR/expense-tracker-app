@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_14_062331) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_14_164658) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -54,13 +54,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_062331) do
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.bigint "guardian_id"
+    t.string "guardian_uid"
     t.string "name"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.string "role", default: "dependent"
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["guardian_id"], name: "index_users_on_guardian_id"
+    t.index ["guardian_uid"], name: "index_users_on_guardian_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["role"], name: "index_users_on_role"
   end
 
   add_foreign_key "expenses", "funds"
@@ -68,4 +74,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_062331) do
   add_foreign_key "fund_users", "funds"
   add_foreign_key "fund_users", "users"
   add_foreign_key "funds", "users", column: "admin_id"
+  add_foreign_key "users", "users", column: "guardian_id"
 end
