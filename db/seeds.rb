@@ -1,111 +1,192 @@
 # frozen_string_literal: true
 
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
+# This file contains seed data for developing and testing the expense tracker application.
+# Run with: rails db:seed
 
 puts "🌱 Seeding database..."
 
-# Create Admin user (only via seed, no API)
-puts "\nCreating admin user..."
-admin = User.find_or_initialize_by(email: "admin@expensetracker.com")
-if admin.new_record?
-  admin.name = "Admin"
-  admin.password = "admin123456"
-  admin.password_confirmation = "admin123456"
-  admin.admin = true
-  admin.save!
-  puts "  ✓ Created admin: Admin (admin@expensetracker.com)"
-else
-  # Update existing admin to ensure admin flag is set
-  admin.update!(admin: true) unless admin.admin?
-  puts "  ✓ Admin already exists: #{admin.email}"
+# Clear existing data (in development only)
+if Rails.env.development?
+  puts "🧹 Clearing existing data..."
+  Expense.destroy_all
+  FundUser.destroy_all
+  Fund.destroy_all
+  User.destroy_all
 end
 
-# Create sample users
-puts "\nCreating sample users..."
-users_data = [
-  { name: "Rahul Sharma", email: "rahul@example.com", password: "password123" },
-  { name: "Priya Sharma", email: "priya@example.com", password: "password123" }
-]
+# ======================
+# CREATE ADMIN USER
+# ======================
+puts "👑 Creating admin user..."
+admin = User.create!(
+  name: "System Admin",
+  email: "admin@expensetracker.com",
+  password: "password123",
+  password_confirmation: "password123",
+  role: "admin"
+)
+puts "   ✅ Admin: #{admin.email} (password: password123)"
 
-users = users_data.map do |user_data|
-  user = User.find_or_initialize_by(email: user_data[:email])
-  if user.new_record?
-    user.name = user_data[:name]
-    user.password = user_data[:password]
-    user.password_confirmation = user_data[:password]
-    user.admin = false
-    user.save!
-    puts "  ✓ Created user: #{user.name} (#{user.email})"
-  else
-    puts "  ✓ User already exists: #{user.email}"
+# ======================
+# CREATE GUARDIAN USERS
+# ======================
+puts "👨‍👩‍👧‍👦 Creating guardian users..."
+
+guardian1 = User.create!(
+  name: "Rajesh Kumar",
+  email: "rajesh@example.com",
+  password: "password123",
+  password_confirmation: "password123",
+  role: "guardian"
+)
+puts "   ✅ Guardian: #{guardian1.email}"
+
+guardian2 = User.create!(
+  name: "Priya Sharma",
+  email: "priya@example.com",
+  password: "password123",
+  password_confirmation: "password123",
+  role: "guardian"
+)
+puts "   ✅ Guardian: #{guardian2.email}"
+
+# ======================
+# CREATE DEPENDENT USERS
+# ======================
+puts "👶 Creating dependent users..."
+
+# Dependents for Guardian 1 (Rajesh)
+dependent1 = User.create!(
+  name: "Arjun Kumar",
+  email: "arjun@example.com",
+  password: "password123",
+  password_confirmation: "password123",
+  role: "dependent",
+  guardian: guardian1
+)
+puts "   ✅ Dependent: #{dependent1.email} (Guardian: #{guardian1.name})"
+
+dependent2 = User.create!(
+  name: "Meera Kumar",
+  email: "meera@example.com",
+  password: "password123",
+  password_confirmation: "password123",
+  role: "dependent",
+  guardian: guardian1
+)
+puts "   ✅ Dependent: #{dependent2.email} (Guardian: #{guardian1.name})"
+
+# Dependents for Guardian 2 (Priya)
+dependent3 = User.create!(
+  name: "Rohan Sharma",
+  email: "rohan@example.com",
+  password: "password123",
+  password_confirmation: "password123",
+  role: "dependent",
+  guardian: guardian2
+)
+puts "   ✅ Dependent: #{dependent3.email} (Guardian: #{guardian2.name})"
+
+# ======================
+# CREATE FUNDS
+# ======================
+puts "💰 Creating funds..."
+
+# Guardian 1's Funds
+fund1 = Fund.create!(
+  name: "Family Monthly Budget",
+  amount: 50000.00,
+  admin: guardian1
+)
+fund1.users << [ guardian1, dependent1, dependent2 ]
+puts "   ✅ Fund: #{fund1.name} (₹#{fund1.amount})"
+
+fund2 = Fund.create!(
+  name: "Emergency Fund",
+  amount: 25000.00,
+  admin: guardian1
+)
+fund2.users << guardian1
+puts "   ✅ Fund: #{fund2.name} (₹#{fund2.amount})"
+
+# Guardian 2's Funds
+fund3 = Fund.create!(
+  name: "Household Expenses",
+  amount: 30000.00,
+  admin: guardian2
+)
+fund3.users << [ guardian2, dependent3 ]
+puts "   ✅ Fund: #{fund3.name} (₹#{fund3.amount})"
+
+# ======================
+# CREATE SAMPLE EXPENSES
+# ======================
+puts "🧾 Creating sample expenses..."
+
+categories = %w[groceries rent travel shopping bills other]
+expense_notes = {
+  "groceries" => [ "Weekly vegetables", "Monthly ration", "Fruits and snacks", "Dairy products" ],
+  "rent" => [ "Monthly rent", "Maintenance fees", "Electricity bill advance" ],
+  "travel" => [ "Bus pass", "Fuel", "Train tickets", "Uber/Ola rides" ],
+  "shopping" => [ "Clothes", "Electronics", "Home appliances", "Books" ],
+  "bills" => [ "Mobile recharge", "Internet bill", "Netflix subscription", "Electricity" ],
+  "other" => [ "Medical expenses", "School fees", "Gifts", "Miscellaneous" ]
+}
+
+# Create expenses for the last 3 months
+[ guardian1, guardian2, dependent1, dependent2, dependent3 ].each do |user|
+  3.times do |month_offset|
+    date_range = (Date.current - month_offset.months).beginning_of_month...(Date.current - month_offset.months).end_of_month
+
+    # Create 3-5 expenses per month per user
+    rand(3..5).times do
+      category = categories.sample
+
+      # Only assign fund sometimes and only for current month to keep more balance
+      fund = nil
+      if month_offset == 0 && rand < 0.3
+        user_funds = user.funds.select { |f| f.remaining_balance > 500 }
+        fund = user_funds.sample if user_funds.any?
+      end
+
+      # Use smaller amounts
+      Expense.create!(
+        user: user,
+        fund: fund,
+        amount: rand(100..500).round(2),
+        category: category,
+        note: expense_notes[category].sample,
+        spent_on: rand(date_range)
+      )
+    end
   end
-  user
+  puts "   ✅ Created expenses for #{user.name}"
 end
 
-rahul, priya = users
-
-# Create sample fund
-puts "\nCreating sample fund..."
-fund = Fund.find_or_initialize_by(name: "Monthly Household")
-if fund.new_record?
-  fund.amount = 50000.00
-  fund.admin = admin
-  fund.save!
-  puts "  ✓ Created fund: #{fund.name} (₹#{fund.amount})"
-  
-  # Assign users to fund
-  [rahul, priya].each do |user|
-    FundUser.find_or_create_by!(fund: fund, user: user)
-    puts "    → Assigned #{user.name} to #{fund.name}"
-  end
-else
-  puts "  ✓ Fund already exists: #{fund.name}"
-end
-
-# Create sample expenses
-puts "\nCreating sample expenses..."
-
-current_month = Date.current
-last_month = Date.current.last_month
-
-expenses_data = [
-  # Rahul's current month expenses from fund
-  { user: rahul, fund: fund, amount: 2500.00, category: "groceries", note: "Weekly vegetables and fruits", spent_on: current_month.beginning_of_month + 5.days },
-  { user: rahul, fund: fund, amount: 1500.00, category: "travel", note: "Uber rides this week", spent_on: current_month.beginning_of_month + 10.days },
-  { user: rahul, fund: fund, amount: 3200.00, category: "bills", note: "Electricity bill", spent_on: current_month.beginning_of_month + 7.days },
-  { user: rahul, fund: fund, amount: 4500.00, category: "shopping", note: "New clothes from mall", spent_on: current_month.beginning_of_month + 12.days },
-  
-  # Priya's current month expenses from fund
-  { user: priya, fund: fund, amount: 1800.00, category: "groceries", note: "Fresh produce from market", spent_on: current_month.beginning_of_month + 3.days },
-  { user: priya, fund: fund, amount: 2200.00, category: "shopping", note: "Books and stationery", spent_on: current_month.beginning_of_month + 8.days },
-  { user: priya, fund: fund, amount: 800.00, category: "travel", note: "Metro recharge", spent_on: current_month.beginning_of_month + 6.days },
-  { user: priya, fund: fund, amount: 5000.00, category: "other", note: "Birthday gift for mom", spent_on: current_month.beginning_of_month + 11.days },
-  
-  # Last month expenses from fund
-  { user: rahul, fund: fund, amount: 2800.00, category: "groceries", note: "Monthly groceries", spent_on: last_month.beginning_of_month + 4.days },
-  { user: priya, fund: fund, amount: 6500.00, category: "shopping", note: "Online shopping", spent_on: last_month.beginning_of_month + 15.days }
-]
-
-expenses_data.each do |expense_data|
-  expense = expense_data[:user].expenses.create!(
-    amount: expense_data[:amount],
-    category: expense_data[:category],
-    note: expense_data[:note],
-    spent_on: expense_data[:spent_on],
-    fund: expense_data[:fund]
-  )
-  puts "  ✓ Added expense: ₹#{format('%.2f', expense.amount)} - #{expense.category} (#{expense.user.name}) [#{expense.fund_name}]"
-end
-
-puts "\n✅ Seeding complete!"
-puts "\n📊 Summary:"
-puts "  Users: #{User.count} (#{User.admins.count} admin, #{User.non_admins.count} regular)"
-puts "  Funds: #{Fund.count}"
-puts "  Total Fund Amount: ₹#{Fund.sum(:amount)}"
-puts "  Expenses: #{Expense.count}"
-puts "  Total Expenses: ₹#{Expense.sum(:amount)}"
-puts "\n🔐 Login credentials:"
-puts "  Admin: admin@expensetracker.com / admin123456"
-puts "  User 1: rahul@example.com / password123"
-puts "  User 2: priya@example.com / password123"
+# ======================
+# SUMMARY
+# ======================
+puts ""
+puts "=" * 50
+puts "🎉 Seeding completed!"
+puts "=" * 50
+puts ""
+puts "📊 Summary:"
+puts "   • Admins: #{User.admins.count}"
+puts "   • Guardians: #{User.guardians.count}"
+puts "   • Dependents: #{User.dependents_role.count}"
+puts "   • Funds: #{Fund.count}"
+puts "   • Expenses: #{Expense.count}"
+puts ""
+puts "🔑 Login Credentials (all use password: password123):"
+puts "   • Admin: admin@expensetracker.com"
+puts "   • Guardian 1: rajesh@example.com (UID: #{guardian1.guardian_uid})"
+puts "   • Guardian 2: priya@example.com (UID: #{guardian2.guardian_uid})"
+puts "   • Dependent 1: arjun@example.com (Guardian: Rajesh)"
+puts "   • Dependent 2: meera@example.com (Guardian: Rajesh)"
+puts "   • Dependent 3: rohan@example.com (Guardian: Priya)"
+puts ""
+puts "🔗 Guardian UIDs for testing dependent registration:"
+puts "   • Rajesh Kumar: #{guardian1.guardian_uid}"
+puts "   • Priya Sharma: #{guardian2.guardian_uid}"
+puts ""

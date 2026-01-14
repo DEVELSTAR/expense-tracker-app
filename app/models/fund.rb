@@ -7,7 +7,7 @@ class Fund < ApplicationRecord
   has_many :expenses, dependent: :nullify
 
   validates :name, presence: true
-  validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :amount, presence: true, numericality: { greater_than_or_equal_to: 100 }
 
   # Scopes
   scope :active, -> { where("amount > 0") }

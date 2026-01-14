@@ -8,7 +8,9 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   # Profile
-  resource :profile, only: [:show]
+  resource :profile, only: [ :show ] do
+    post :regenerate_guardian_uid, on: :member
+  end
 
   # Expenses CRUD (for regular users)
   resources :expenses
@@ -20,7 +22,7 @@ Rails.application.routes.draw do
     root "dashboard#index"
     resources :users
     resources :funds
-    resources :expenses, only: [:index, :show, :edit, :update, :destroy]
+    resources :expenses, only: [ :index, :show, :edit, :update, :destroy ]
   end
 
   # Health check

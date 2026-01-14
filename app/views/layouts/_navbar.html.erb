@@ -37,11 +37,14 @@
             </div>
             <div class="hidden sm:block text-left">
               <p class="text-sm font-medium text-white"><%= current_user.display_name %></p>
-              <p class="text-xs text-gray-400">
-                <% if current_user.admin? %>
-                  <span class="text-yellow-400">Admin</span>
-                <% else %>
-                  View Profile
+              <p class="text-xs">
+                <% case current_user.role %>
+                <% when "admin" %>
+                  <span class="text-red-400">Admin</span>
+                <% when "guardian" %>
+                  <span class="text-emerald-400">Guardian</span>
+                <% when "dependent" %>
+                  <span class="text-blue-400">Dependent</span>
                 <% end %>
               </p>
             </div>
