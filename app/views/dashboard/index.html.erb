@@ -75,12 +75,12 @@
     <%= form_with url: root_path, method: :get, class: "flex flex-wrap items-end gap-4 w-full", data: { turbo_frame: "_top" } do |f| %>
       <div class="input-group flex-1 min-w-[200px]">
         <%= f.label :month, "Month", class: "input-label" %>
-        <%= f.month_field :month, value: @current_month.strftime("%Y-%m"), class: "input" %>
+        <%= f.month_field :month, value: @current_month.strftime("%Y-%m"), class: "input", style: "border-radius: 12px;" %>
       </div>
       
-      <div class="flex items-center gap-2">
-        <%= f.submit "Apply Filters", class: "btn-primary" %>
-        <%= link_to "Reset", root_path, class: "btn-secondary" %>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary" style="border-radius: 12px; padding: 10px 20px;">Apply Filters</button>
+        <%= link_to "Reset", root_path, class: "btn-secondary", style: "border-radius: 12px; padding: 10px 20px;" %>
       </div>
     <% end %>
   </div>
