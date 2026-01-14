@@ -1,0 +1,23 @@
+<% content_for :title, "Edit User - Admin" %>
+
+<div class="max-w-2xl mx-auto animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Edit User</h1>
+      <p class="page-subtitle">Update <%= @user.display_name %>'s account</p>
+    </div>
+  </div>
+
+  <div class="card p-6 md:p-8">
+    <%= render "form", user: @user %>
+  </div>
+
+  <% unless @user.admin? || @user == current_user %>
+    <div class="mt-6 flex justify-end">
+      <%= button_to "Delete this user", admin_user_path(@user),
+          method: :delete,
+          class: "btn-danger",
+          data: { turbo_confirm: "Are you sure you want to delete #{@user.display_name}? This will also delete all their expenses." } %>
+    </div>
+  <% end %>
+</div>

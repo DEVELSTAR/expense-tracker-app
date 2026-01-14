@@ -10,10 +10,11 @@ Rails.application.routes.draw do
   # Expenses CRUD
   resources :expenses
 
+  # Admin namespace
+  namespace :admin do
+    resources :users
+  end
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # PWA files
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 end

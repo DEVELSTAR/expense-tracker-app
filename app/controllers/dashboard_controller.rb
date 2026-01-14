@@ -9,18 +9,23 @@ class DashboardController < ApplicationController
     # Base query for the current month
     expenses_base = current_user.expenses.by_month(@current_month)
 
-    # Apply spent_by filter if present
-    if params[:spent_by].present? && Expense.spent_bys.key?(params[:spent_by])
-      expenses_base = expenses_base.by_spent_by(params[:spent_by])
+    # Apply user filter if present (for admin viewing)
+    if params[:user_id].present? && current_user.admin?
+      expenses_base = Expense.by_month(@current_month).by_user(params[:user_id])
     end
 
     # Calculate aggregations before applying ORDER BY
     @monthly_total = expenses_base.sum(:amount)
     @category_totals = expenses_base.group(:category).sum(:amount)
-    @spent_by_totals = expenses_base.group(:spent_by).sum(:amount)
+    
+    # Group by user for breakdown
+    @user_totals = expenses_base.joins(:user).group("users.name").sum(:amount)
 
     # Get sorted expenses list for display
-    @expenses = expenses_base.recent
-    @expense_count = @expenses.count
+    @expenses = expenses_base.includes(:user).recent
+    @expense_count = @expenses.size
+    
+    # For admin: get all users for filter dropdown
+    @users = User.non_admins if current_user.admin?
   end
 end

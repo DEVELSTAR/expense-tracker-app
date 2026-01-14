@@ -10,4 +10,17 @@ class User < ApplicationRecord
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: { case_sensitive: false }
+
+  # Scopes
+  scope :admins, -> { where(admin: true) }
+  scope :non_admins, -> { where(admin: false) }
+
+  # Instance methods
+  def admin?
+    admin == true
+  end
+
+  def display_name
+    name.presence || email.split("@").first.capitalize
+  end
 end

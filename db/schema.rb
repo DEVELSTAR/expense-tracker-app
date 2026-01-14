@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_13_182700) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_14_055814) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,17 +19,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_13_182700) do
     t.string "category", null: false
     t.datetime "created_at", null: false
     t.text "note"
-    t.integer "spent_by", default: 0, null: false
     t.date "spent_on", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["category"], name: "index_expenses_on_category"
-    t.index ["spent_by"], name: "index_expenses_on_spent_by"
     t.index ["spent_on"], name: "index_expenses_on_spent_on"
     t.index ["user_id"], name: "index_expenses_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
+    t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false

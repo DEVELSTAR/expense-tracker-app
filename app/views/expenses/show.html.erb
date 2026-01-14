@@ -4,62 +4,71 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">Expense Details</h1>
-      <p class="page-subtitle">Viewing expense from <%= @expense.spent_on.strftime("%B %d, %Y") %></p>
+      <p class="page-subtitle">View expense information</p>
     </div>
     <div class="flex items-center gap-3">
-      <%= link_to edit_expense_path(@expense), class: "btn-secondary" do %>
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <%= link_to edit_expense_path(@expense), class: "btn-secondary inline-flex items-center gap-2" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
         </svg>
-        Edit
+        <span>Edit</span>
       <% end %>
       <%= link_to root_path, class: "btn-ghost" do %>
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-        Back
+        Back to Dashboard
       <% end %>
     </div>
   </div>
 
-  <div class="card overflow-hidden">
+  <div class="card">
     <%# Amount Header %>
-    <div class="bg-gradient-to-r from-primary-600 to-secondary-600 p-8 text-center">
-      <p class="text-sm text-white/70 uppercase tracking-wider mb-2">Amount</p>
-      <p class="text-4xl font-bold text-white">$<%= number_with_precision(@expense.amount, precision: 2, delimiter: ",") %></p>
+    <div class="p-6 md:p-8 border-b border-dark-border text-center">
+      <span class="text-4xl md:text-5xl font-bold text-gradient">
+        ₹<%= number_with_precision(@expense.amount, precision: 2, delimiter: ",") %>
+      </span>
+      <p class="text-gray-400 mt-2">
+        <%= @expense.spent_on.strftime("%A, %B %d, %Y") %>
+      </p>
     </div>
 
     <%# Details %>
-    <div class="p-6 space-y-6">
-      <div class="grid grid-cols-2 gap-6">
+    <div class="p-6 md:p-8 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <%# Category %>
         <div>
-          <p class="text-sm text-gray-400 mb-1">Date</p>
-          <p class="text-lg font-medium text-white"><%= @expense.spent_on.strftime("%B %d, %Y") %></p>
+          <label class="text-sm text-gray-500 uppercase tracking-wide">Category</label>
+          <p class="mt-1">
+            <span class="category-<%= @expense.category.downcase.gsub(/\s+/, '-') %>">
+              <%= @expense.category.capitalize %>
+            </span>
+          </p>
         </div>
+
+        <%# Created By %>
         <div>
-          <p class="text-sm text-gray-400 mb-1">Category</p>
-          <span class="category-<%= @expense.category.downcase.gsub(/\s+/, '-') %>">
-            <%= @expense.category.capitalize %>
-          </span>
-        </div>
-        <div>
-          <p class="text-sm text-gray-400 mb-1">Spent By</p>
-          <span class="<%= @expense.spent_by_self_expense? ? 'badge-primary' : 'badge-secondary' %>">
-            <%= @expense.spent_by_label %>
-          </span>
-        </div>
-        <div>
-          <p class="text-sm text-gray-400 mb-1">Created</p>
-          <p class="text-white"><%= @expense.created_at.strftime("%b %d, %Y at %I:%M %p") %></p>
+          <label class="text-sm text-gray-500 uppercase tracking-wide">Created By</label>
+          <p class="mt-1">
+            <span class="badge-primary"><%= @expense.creator_name %></span>
+          </p>
         </div>
       </div>
 
+      <%# Note %>
       <% if @expense.note.present? %>
-        <div class="pt-4 border-t border-dark-border">
-          <p class="text-sm text-gray-400 mb-2">Note</p>
-          <p class="text-gray-300"><%= @expense.note %></p>
+        <div>
+          <label class="text-sm text-gray-500 uppercase tracking-wide">Note</label>
+          <p class="mt-1 text-gray-300 whitespace-pre-wrap"><%= @expense.note %></p>
         </div>
       <% end %>
+
+      <%# Metadata %>
+      <div class="pt-4 border-t border-dark-border">
+        <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+          <span>Created: <%= @expense.created_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+          <% if @expense.updated_at != @expense.created_at %>
+            <span>Updated: <%= @expense.updated_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+          <% end %>
+        </div>
+      </div>
     </div>
   </div>
 </div>
