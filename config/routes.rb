@@ -7,6 +7,9 @@ Rails.application.routes.draw do
   # Dashboard (root)
   root "dashboard#index"
 
+  # Profile
+  resource :profile, only: [:show]
+
   # Expenses CRUD (for regular users)
   resources :expenses
 
