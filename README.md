@@ -197,7 +197,71 @@ bin/brakeman
 
 ## Deployment
 
-### Docker
+### Deploy to Render (Recommended)
+
+This app is configured for easy deployment to [Render](https://render.com/).
+
+#### Option 1: One-Click Deploy with Blueprint
+
+1. Push your code to GitHub
+2. Go to [Render Dashboard](https://dashboard.render.com/)
+3. Click **New** → **Blueprint**
+4. Connect your GitHub repository
+5. Render will automatically detect the `render.yaml` file and set up:
+   - A web service for the Rails app
+   - A PostgreSQL database
+
+#### Option 2: Manual Setup
+
+1. **Create a PostgreSQL Database:**
+   - Go to Render Dashboard → New → PostgreSQL
+   - Name: `expense-tracker-db`
+   - Plan: Free
+   - Click "Create Database"
+
+2. **Create a Web Service:**
+   - Go to Render Dashboard → New → Web Service
+   - Connect your GitHub repository
+   - Configure:
+     - **Name:** `expense-tracker`
+     - **Runtime:** Ruby
+     - **Build Command:** `./bin/render-build.sh`
+     - **Start Command:** `bundle exec puma -C config/puma.rb`
+
+3. **Set Environment Variables:**
+   - `DATABASE_URL`: (Auto-linked from your PostgreSQL database)
+   - `RAILS_MASTER_KEY`: (Copy from `config/master.key` in your local project)
+   - `RAILS_ENV`: `production`
+   - `RAILS_LOG_TO_STDOUT`: `true`
+   - `RAILS_SERVE_STATIC_FILES`: `true`
+
+4. **Deploy:**
+   - Click "Create Web Service"
+   - Render will automatically build and deploy your app
+
+#### Adding the Master Key
+
+The `RAILS_MASTER_KEY` is required to decrypt Rails credentials in production:
+
+```bash
+# View your master key locally
+cat config/master.key
+```
+
+Copy this value and add it as an environment variable in Render.
+
+#### Seeding Production Data
+
+After the first deploy, you can seed the database by running:
+
+```bash
+# In Render Dashboard, go to your web service → Shell
+bundle exec rails db:seed
+```
+
+Or uncomment the seed lines in `bin/render-build.sh` for automatic seeding.
+
+### Docker Deployment
 
 The app includes a `Dockerfile` for containerized deployment:
 
@@ -211,13 +275,17 @@ docker run -p 3000:3000 expense-tracker
 
 ### Environment Variables
 
-For production, set the following environment variables:
+For production, the following environment variables are used:
 
-```bash
-RAILS_ENV=production
-SECRET_KEY_BASE=<your-secret-key>
-DATABASE_URL=postgres://user:pass@host:5432/expense_tracker_production
-```
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `RAILS_MASTER_KEY` | Key to decrypt credentials | Yes |
+| `RAILS_ENV` | Set to `production` | Yes |
+| `RAILS_LOG_TO_STDOUT` | Enable logging to stdout | Yes |
+| `RAILS_SERVE_STATIC_FILES` | Serve static assets | Yes |
+| `RENDER_EXTERNAL_URL` | Auto-set by Render | Auto |
+| `RENDER_EXTERNAL_HOSTNAME` | Auto-set by Render | Auto |
 
 ## Contributing
 
@@ -237,3 +305,4 @@ This project is open-source and available under the [MIT License](LICENSE).
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Devise](https://github.com/heartcombo/devise)
 - [Hotwire](https://hotwired.dev/)
+- [Render](https://render.com/)
