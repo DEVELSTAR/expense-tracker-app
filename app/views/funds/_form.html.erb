@@ -1,0 +1,32 @@
+<%= form_with(model: fund, local: true, class: "space-y-6") do |f| %>
+  <% if fund.errors.any? %>
+    <div class="alert-error mb-6">
+      <h3 class="font-bold mb-2"><%= pluralize(fund.errors.count, "error") %> prohibited this fund from being saved:</h3>
+      <ul class="list-disc list-inside text-sm">
+        <% fund.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="input-group">
+    <%= f.label :name, "Fund Name", class: "input-label" %>
+    <%= f.text_field :name, class: "input", placeholder: "e.g., Summer Vacation, House Renovation" %>
+  </div>
+
+  <div class="input-group">
+    <%= f.label :amount, "Budget Amount (₹)", class: "input-label" %>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <span class="text-gray-400">₹</span>
+      </div>
+      <%= f.number_field :amount, step: "0.01", class: "input pl-8", placeholder: "0.00" %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-4 pt-4">
+    <%= link_to "Cancel", funds_path, class: "btn-ghost flex-1 text-center" %>
+    <%= f.submit fund.new_record? ? "Create Fund" : "Update Fund", class: "btn-primary flex-1" %>
+  </div>
+<% end %>

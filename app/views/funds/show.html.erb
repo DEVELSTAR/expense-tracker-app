@@ -1,0 +1,88 @@
+<% content_for :title, "#{@fund.name} - ExpenseTracker" %>
+
+<div class="animate-fade-in">
+  <div class="page-header mb-8">
+    <div class="flex items-center gap-4">
+      <%= link_to funds_path, class: "p-2 rounded-lg hover:bg-dark-surface-elevated transition-colors text-gray-400 hover:text-white" do %>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+      <% end %>
+      <div>
+        <h1 class="page-title"><%= @fund.name %></h1>
+        <p class="page-subtitle">Managed by You</p>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <%= link_to edit_fund_path(@fund), class: "btn-secondary" do %>
+        Edit Fund
+      <% end %>
+    </div>
+  </div>
+
+  <%# Overview Cards %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="card p-6">
+      <span class="text-gray-400 text-sm">Total Budget</span>
+      <p class="text-2xl font-bold text-white mt-1">₹<%= number_with_precision(@fund.amount, precision: 2, delimiter: ",") %></p>
+    </div>
+    
+    <div class="card p-6">
+      <span class="text-gray-400 text-sm">Total Spent</span>
+      <p class="text-2xl font-bold text-red-400 mt-1">₹<%= number_with_precision(@fund.total_spent, precision: 2, delimiter: ",") %></p>
+    </div>
+
+    <div class="card p-6">
+      <span class="text-gray-400 text-sm">Remaining</span>
+      <p class="text-2xl font-bold text-green-400 mt-1">₹<%= number_with_precision(@fund.remaining_balance, precision: 2, delimiter: ",") %></p>
+    </div>
+  </div>
+
+  <%# Progress %>
+  <div class="card p-6 mb-8">
+    <h3 class="text-lg font-semibold text-white mb-4">Budget Progress</h3>
+    <% spent_percent = @fund.amount > 0 ? (@fund.total_spent / @fund.amount * 100).clamp(0, 100) : 0 %>
+    <div class="relative pt-1">
+      <div class="overflow-hidden h-4 text-xs flex rounded-full bg-dark-border">
+        <div style="width: <%= spent_percent %>%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center <%= spent_percent > 90 ? 'bg-red-500' : spent_percent > 60 ? 'bg-yellow-500' : 'bg-green-500' %> transition-all duration-500"></div>
+      </div>
+      <div class="flex justify-between text-xs mt-2 text-gray-400">
+        <span>0%</span>
+        <span><%= number_with_precision(spent_percent, precision: 1) %>% Used</span>
+        <span>100%</span>
+      </div>
+    </div>
+  </div>
+
+  <%# Recent Expenses %>
+  <div class="card">
+    <div class="p-6 border-b border-dark-border flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-white">Recent Expenses</h2>
+    </div>
+    <% if @recent_expenses.any? %>
+      <div class="divide-y divide-dark-border">
+        <% @recent_expenses.each do |expense| %>
+          <div class="p-4 flex items-center justify-between hover:bg-dark-surface-elevated/50 transition-colors">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-400">
+                <%= expense.category[0].upcase %>
+              </div>
+              <div>
+                <p class="font-medium text-white"><%= expense.creator_name %></p>
+                <p class="text-sm text-gray-400"><%= expense.category.capitalize %> • <%= expense.spent_on.strftime("%b %d, %Y") %></p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-semibold text-red-400">-₹<%= number_with_precision(expense.amount, precision: 2, delimiter: ",") %></p>
+              <%= link_to "View", expense_path(expense), class: "text-xs text-primary-400 hover:text-primary-300" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="p-8 text-center text-gray-400">
+        No expenses recorded against this fund yet.
+      </div>
+    <% end %>
+  </div>
+</div>

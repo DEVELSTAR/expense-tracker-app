@@ -1,0 +1,12 @@
+<% content_for :title, "New Personal Fund - ExpenseTracker" %>
+
+<div class="max-w-xl mx-auto animate-fade-in pt-12">
+  <div class="card p-8">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-white">Create Personal Fund</h1>
+      <p class="text-gray-400 mt-2">Set up a new fund to track specific expenses</p>
+    </div>
+
+    <%= render "form", fund: @fund %>
+  </div>
+</div>
