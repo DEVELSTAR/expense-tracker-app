@@ -8,10 +8,7 @@ development:
 test:
   adapter: test
 
+# For production on Render free tier, use async adapter (simpler, no extra database needed)
+# Upgrade to solid_cable with Redis for high-traffic production use
 production:
-  adapter: solid_cable
-  connects_to:
-    database:
-      writing: cable
-  polling_interval: 0.1.seconds
-  message_retention: 1.day
+  adapter: async
