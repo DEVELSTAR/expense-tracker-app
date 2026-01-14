@@ -34,22 +34,28 @@
     </div>
 
     <%# Category Field %>
-    <div class="input-group md:col-span-2">
+    <div class="input-group">
       <%= f.label :category, class: "input-label" %>
-      <div class="flex flex-col gap-2">
-        <%= f.select :category, 
-            options_for_select(Expense::CATEGORIES.map { |c| [c.capitalize, c] }, expense.category),
-            { include_blank: "Select category or type below" },
-            class: "select", 
-            id: "category_select",
-            data: { action: "change->expense-form#toggleCustomCategory" } %>
-        <span class="text-gray-500 text-sm text-center">or</span>
-        <%= f.text_field :category, 
-            placeholder: "Enter custom category",
-            class: "input",
-            id: "custom_category" %>
-      </div>
+      <%= f.select :category, 
+          options_for_select(Expense::CATEGORIES.map { |c| [c.capitalize, c] }, expense.category),
+          { include_blank: "Select category" },
+          class: "select" %>
     </div>
+
+    <%# Fund Selection (if user has funds) %>
+    <% if @funds.present? && @funds.any? %>
+      <div class="input-group">
+        <%= f.label :fund_id, "Pay From", class: "input-label" %>
+        <%= f.select :fund_id,
+            options_for_select(
+              @funds.map { |fund| ["#{fund.name} (₹#{number_with_precision(fund.remaining_balance, precision: 0, delimiter: ',')} left)", fund.id] },
+              expense.fund_id
+            ),
+            { include_blank: "Personal (No Fund)" },
+            class: "select" %>
+        <p class="text-xs text-gray-500 mt-1">Select a fund to deduct from, or leave empty for personal expense</p>
+      </div>
+    <% end %>
   </div>
 
   <%# Note Field %>
@@ -67,22 +73,3 @@
     <%= link_to "Cancel", root_path, class: "btn-secondary btn-lg" %>
   </div>
 <% end %>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const categorySelect = document.getElementById('category_select');
-    const customCategory = document.getElementById('custom_category');
-    
-    categorySelect.addEventListener('change', function() {
-      if (this.value) {
-        customCategory.value = this.value;
-      }
-    });
-    
-    customCategory.addEventListener('input', function() {
-      if (this.value) {
-        categorySelect.value = '';
-      }
-    });
-  });
-</script>

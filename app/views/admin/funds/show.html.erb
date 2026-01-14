@@ -1,0 +1,127 @@
+<% content_for :title, "#{@fund.name} - Fund Details" %>
+
+<div class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><%= @fund.name %></h1>
+      <p class="page-subtitle">Created by <%= @fund.admin.display_name %> on <%= @fund.created_at.strftime("%B %d, %Y") %></p>
+    </div>
+    <div class="flex items-center gap-3">
+      <%= link_to edit_admin_fund_path(@fund), class: "btn-secondary inline-flex items-center gap-2" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+        <span>Edit</span>
+      <% end %>
+      <%= link_to admin_funds_path, class: "btn-ghost" do %>
+        ← Back to Funds
+      <% end %>
+    </div>
+  </div>
+
+  <%# Overview Cards %>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+    <div class="stat-card">
+      <span class="stat-label">Total Budget</span>
+      <p class="stat-value"><%= @fund.formatted_amount %></p>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Total Spent</span>
+      <p class="text-3xl font-bold text-red-400">₹<%= number_with_precision(@fund.total_spent, precision: 2, delimiter: ",") %></p>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Remaining</span>
+      <p class="text-3xl font-bold text-green-400"><%= @fund.formatted_remaining %></p>
+    </div>
+  </div>
+
+  <%# Progress Bar %>
+  <div class="card p-6 mb-8">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-gray-400">Budget Utilization</span>
+      <% spent_percent = @fund.amount > 0 ? (@fund.total_spent / @fund.amount * 100).clamp(0, 100) : 0 %>
+      <span class="text-white font-medium"><%= spent_percent.round(1) %>%</span>
+    </div>
+    <div class="w-full h-3 bg-dark-surface-elevated rounded-full overflow-hidden">
+      <div class="h-full rounded-full <%= spent_percent > 80 ? 'bg-red-500' : spent_percent > 50 ? 'bg-yellow-500' : 'bg-green-500' %> transition-all" style="width: <%= spent_percent %>%"></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <%# User Breakdown %>
+    <div class="card">
+      <div class="p-6 border-b border-dark-border">
+        <h2 class="text-lg font-semibold text-white">Spending by User</h2>
+      </div>
+      <% if @user_breakdown.any? %>
+        <div class="divide-y divide-dark-border">
+          <% @user_breakdown.each do |name, amount| %>
+            <div class="p-4 flex items-center justify-between">
+              <span class="text-white"><%= name %></span>
+              <span class="font-semibold text-red-400">₹<%= number_with_precision(amount, precision: 2, delimiter: ",") %></span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="p-6 text-center text-gray-400">No expenses yet</div>
+      <% end %>
+    </div>
+
+    <%# Assigned Users %>
+    <div class="card">
+      <div class="p-6 border-b border-dark-border">
+        <h2 class="text-lg font-semibold text-white">Assigned Users (<%= @fund.users.count %>)</h2>
+      </div>
+      <% if @fund.users.any? %>
+        <div class="divide-y divide-dark-border">
+          <% @fund.users.each do |user| %>
+            <div class="p-4 flex items-center justify-between">
+              <div>
+                <p class="text-white font-medium"><%= user.display_name %></p>
+                <p class="text-sm text-gray-400"><%= user.email %></p>
+              </div>
+              <span class="text-gray-400">₹<%= number_with_precision(@fund.spent_by_user(user), precision: 2, delimiter: ",") %> spent</span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="p-6 text-center text-gray-400">No users assigned</div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Recent Expenses %>
+  <div class="card">
+    <div class="p-6 border-b border-dark-border">
+      <h2 class="text-lg font-semibold text-white">Recent Expenses</h2>
+    </div>
+    <% if @expenses.any? %>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>User</th>
+              <th>Category</th>
+              <th>Note</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @expenses.each do |expense| %>
+              <tr>
+                <td class="text-gray-300"><%= expense.spent_on.strftime("%b %d, %Y") %></td>
+                <td class="text-white"><%= expense.creator_name %></td>
+                <td><span class="text-xs px-2 py-1 rounded-full bg-primary-500/20 text-primary-300"><%= expense.category.capitalize %></span></td>
+                <td class="text-gray-400 max-w-xs truncate"><%= expense.note.presence || "—" %></td>
+                <td class="text-right text-red-400 font-medium">-<%= expense.formatted_amount %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="p-6 text-center text-gray-400">No expenses from this fund yet</div>
+    <% end %>
+  </div>
+</div>

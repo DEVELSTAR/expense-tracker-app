@@ -1,0 +1,160 @@
+<% content_for :title, "Admin Dashboard - ExpenseTracker" %>
+
+<div class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Admin Dashboard</h1>
+      <p class="page-subtitle">Manage funds, users, and expenses</p>
+    </div>
+  </div>
+
+  <%# Stats Cards %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="stat-card">
+      <div class="flex items-center gap-3 text-gray-400 mb-2">
+        <div class="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+          </svg>
+        </div>
+        <span class="stat-label">Total Users</span>
+      </div>
+      <p class="stat-value"><%= @users_count %></p>
+    </div>
+
+    <div class="stat-card">
+      <div class="flex items-center gap-3 text-gray-400 mb-2">
+        <div class="w-10 h-10 rounded-xl bg-secondary-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+        </div>
+        <span class="stat-label">Total Funds</span>
+      </div>
+      <p class="stat-value"><%= @funds_count %></p>
+    </div>
+
+    <div class="stat-card">
+      <div class="flex items-center gap-3 text-gray-400 mb-2">
+        <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <span class="stat-label">Total Fund Amount</span>
+      </div>
+      <p class="stat-value">₹<%= number_with_precision(@total_fund_amount, precision: 2, delimiter: ",") %></p>
+    </div>
+
+    <div class="stat-card">
+      <div class="flex items-center gap-3 text-gray-400 mb-2">
+        <div class="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        </div>
+        <span class="stat-label">Total Spent</span>
+      </div>
+      <p class="stat-value">₹<%= number_with_precision(@total_expenses, precision: 2, delimiter: ",") %></p>
+    </div>
+  </div>
+
+  <%# Quick Actions %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <%= link_to admin_users_path, class: "card p-6 hover:border-primary-500/50 transition-colors group" do %>
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-primary-500/20 flex items-center justify-center group-hover:bg-primary-500/30 transition-colors">
+          <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-white">Manage Users</h3>
+          <p class="text-gray-400 text-sm">Add, edit, or remove users</p>
+        </div>
+      </div>
+    <% end %>
+
+    <%= link_to admin_funds_path, class: "card p-6 hover:border-secondary-500/50 transition-colors group" do %>
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-secondary-500/20 flex items-center justify-center group-hover:bg-secondary-500/30 transition-colors">
+          <svg class="w-6 h-6 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-white">Manage Funds</h3>
+          <p class="text-gray-400 text-sm">Create and allocate funds</p>
+        </div>
+      </div>
+    <% end %>
+
+    <%= link_to new_admin_fund_path, class: "card p-6 hover:border-green-500/50 transition-colors group" do %>
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+          <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-white">Create New Fund</h3>
+          <p class="text-gray-400 text-sm">Add budget for users</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Recent Activity %>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <%# Recent Funds %>
+    <div class="card">
+      <div class="p-6 border-b border-dark-border flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-white">Recent Funds</h2>
+        <%= link_to "View All", admin_funds_path, class: "text-primary-400 text-sm hover:text-primary-300" %>
+      </div>
+      <% if @recent_funds.any? %>
+        <div class="divide-y divide-dark-border">
+          <% @recent_funds.each do |fund| %>
+            <div class="p-4 flex items-center justify-between">
+              <div>
+                <p class="font-medium text-white"><%= fund.name %></p>
+                <p class="text-sm text-gray-400"><%= fund.users.count %> users assigned</p>
+              </div>
+              <div class="text-right">
+                <p class="font-semibold text-green-400"><%= fund.formatted_remaining %></p>
+                <p class="text-sm text-gray-500">of <%= fund.formatted_amount %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="p-6 text-center text-gray-400">No funds created yet</div>
+      <% end %>
+    </div>
+
+    <%# Recent Expenses %>
+    <div class="card">
+      <div class="p-6 border-b border-dark-border flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-white">Recent Expenses</h2>
+      </div>
+      <% if @recent_expenses.any? %>
+        <div class="divide-y divide-dark-border">
+          <% @recent_expenses.each do |expense| %>
+            <div class="p-4 flex items-center justify-between">
+              <div>
+                <p class="font-medium text-white"><%= expense.creator_name %></p>
+                <p class="text-sm text-gray-400"><%= expense.category.capitalize %> • <%= expense.fund_name %></p>
+              </div>
+              <div class="text-right">
+                <p class="font-semibold text-red-400">-<%= expense.formatted_amount %></p>
+                <p class="text-sm text-gray-500"><%= expense.spent_on.strftime("%b %d") %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="p-6 text-center text-gray-400">No expenses yet</div>
+      <% end %>
+    </div>
+  </div>
+</div>

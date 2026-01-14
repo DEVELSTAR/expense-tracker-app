@@ -7,12 +7,15 @@ Rails.application.routes.draw do
   # Dashboard (root)
   root "dashboard#index"
 
-  # Expenses CRUD
+  # Expenses CRUD (for regular users)
   resources :expenses
 
   # Admin namespace
   namespace :admin do
+    root "dashboard#index"
     resources :users
+    resources :funds
+    resources :expenses, only: [:index, :show, :edit, :update, :destroy]
   end
 
   # Health check

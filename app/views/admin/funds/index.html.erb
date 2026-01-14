@@ -1,0 +1,99 @@
+<% content_for :title, "Manage Funds - Admin" %>
+
+<div class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Manage Funds</h1>
+      <p class="page-subtitle">Create and manage budget allocations</p>
+    </div>
+    <%= link_to new_admin_fund_path, class: "btn-primary inline-flex items-center gap-2" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      <span>Create Fund</span>
+    <% end %>
+  </div>
+
+  <% if @funds.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @funds.each do |fund| %>
+        <div class="card p-6">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-semibold text-white"><%= fund.name %></h3>
+              <p class="text-sm text-gray-400">Created <%= fund.created_at.strftime("%b %d, %Y") %></p>
+            </div>
+            <div class="flex items-center gap-2">
+              <%= link_to edit_admin_fund_path(fund), class: "btn-ghost btn-sm" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              <% end %>
+              <%= button_to admin_fund_path(fund), method: :delete,
+                  class: "btn-ghost btn-sm text-red-400 hover:text-red-300",
+                  data: { turbo_confirm: "Are you sure you want to delete this fund?" } do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              <% end %>
+            </div>
+          </div>
+
+          <%# Progress Bar %>
+          <div class="mb-4">
+            <div class="flex items-center justify-between text-sm mb-2">
+              <span class="text-gray-400">Spent</span>
+              <span class="text-white font-medium">₹<%= number_with_precision(fund.total_spent, precision: 2, delimiter: ",") %> / ₹<%= number_with_precision(fund.amount, precision: 2, delimiter: ",") %></span>
+            </div>
+            <div class="w-full h-2 bg-dark-surface-elevated rounded-full overflow-hidden">
+              <% spent_percent = fund.amount > 0 ? (fund.total_spent / fund.amount * 100).clamp(0, 100) : 0 %>
+              <div class="h-full rounded-full <%= spent_percent > 80 ? 'bg-red-500' : spent_percent > 50 ? 'bg-yellow-500' : 'bg-green-500' %>" style="width: <%= spent_percent %>%"></div>
+            </div>
+          </div>
+
+          <%# Stats %>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="p-3 bg-dark-surface-elevated rounded-lg text-center">
+              <p class="text-2xl font-bold text-green-400"><%= fund.formatted_remaining %></p>
+              <p class="text-xs text-gray-500 uppercase">Remaining</p>
+            </div>
+            <div class="p-3 bg-dark-surface-elevated rounded-lg text-center">
+              <p class="text-2xl font-bold text-white"><%= fund.users.count %></p>
+              <p class="text-xs text-gray-500 uppercase">Users</p>
+            </div>
+          </div>
+
+          <%# Assigned Users %>
+          <% if fund.users.any? %>
+            <div class="border-t border-dark-border pt-4">
+              <p class="text-xs text-gray-500 uppercase mb-2">Assigned Users</p>
+              <div class="flex flex-wrap gap-2">
+                <% fund.users.each do |user| %>
+                  <span class="text-xs px-2 py-1 rounded-full bg-primary-500/20 text-primary-300"><%= user.display_name %></span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <%= link_to admin_fund_path(fund), class: "mt-4 block text-center text-primary-400 text-sm hover:text-primary-300" do %>
+            View Details →
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-state-icon">💰</div>
+        <h3 class="empty-state-title">No funds created yet</h3>
+        <p class="empty-state-description mb-6">Create your first fund to start allocating budgets to users.</p>
+        <%= link_to new_admin_fund_path, class: "btn-primary inline-flex items-center gap-2" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span>Create First Fund</span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
