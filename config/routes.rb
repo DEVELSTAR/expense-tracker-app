@@ -12,6 +12,8 @@ Rails.application.routes.draw do
 
   # Expenses CRUD (for regular users)
   resources :expenses
+  # Personal Funds CRUD
+  resources :funds
 
   # Admin namespace
   namespace :admin do
