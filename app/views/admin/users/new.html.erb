@@ -1,0 +1,14 @@
+<% content_for :title, "New User - Admin" %>
+
+<div class="max-w-2xl mx-auto animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Add New User</h1>
+      <p class="page-subtitle">Create a new user account</p>
+    </div>
+  </div>
+
+  <div class="card p-6 md:p-8">
+    <%= render "form", user: @user %>
+  </div>
+</div>

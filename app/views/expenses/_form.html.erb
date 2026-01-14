@@ -18,69 +18,53 @@
   <% end %>
 
   <div class="form-grid">
-    <%# Amount %>
+    <%# Amount Field %>
     <div class="input-group">
       <%= f.label :amount, class: "input-label" %>
       <div class="relative">
-        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-        <%= f.number_field :amount, step: 0.01, min: 0, placeholder: "0.00", class: "input pl-8" %>
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">₹</span>
+        <%= f.number_field :amount, step: 0.01, min: 0, placeholder: "0.00", class: "input pl-10" %>
       </div>
     </div>
 
-    <%# Spent On %>
+    <%# Date Field %>
     <div class="input-group">
       <%= f.label :spent_on, "Date", class: "input-label" %>
       <%= f.date_field :spent_on, class: "input" %>
     </div>
 
-    <%# Category %>
+    <%# Category Field %>
     <div class="input-group">
       <%= f.label :category, class: "input-label" %>
-      <div class="space-y-2">
-        <%= f.select :category, 
-            options_for_select(
-              Expense::CATEGORIES.map { |c| [c.capitalize, c] },
-              expense.category
-            ),
-            { include_blank: "Select category or type below" },
-            class: "select", id: "category-select" %>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-500">or</span>
-          <input type="text" 
-                 id="custom-category" 
-                 placeholder="Enter custom category"
-                 class="input text-sm py-2"
-                 data-controller="custom-category">
-        </div>
-      </div>
+      <%= f.select :category, 
+          options_for_select(Expense::CATEGORIES.map { |c| [c.capitalize, c] }, expense.category),
+          { include_blank: "Select category" },
+          class: "select" %>
     </div>
 
-    <%# Spent By %>
-    <div class="input-group">
-      <%= f.label :spent_by, class: "input-label" %>
-      <div class="flex gap-4">
-        <label class="flex items-center gap-3 p-4 rounded-xl border border-dark-border cursor-pointer hover:bg-dark-surface-elevated transition-colors flex-1">
-          <%= f.radio_button :spent_by, "self_expense", class: "w-4 h-4 text-primary-500 bg-dark-surface border-dark-border focus:ring-primary-500" %>
-          <div>
-            <span class="text-white font-medium">Self</span>
-            <p class="text-xs text-gray-500">Your expense</p>
-          </div>
-        </label>
-        <label class="flex items-center gap-3 p-4 rounded-xl border border-dark-border cursor-pointer hover:bg-dark-surface-elevated transition-colors flex-1">
-          <%= f.radio_button :spent_by, "wife", class: "w-4 h-4 text-secondary-500 bg-dark-surface border-dark-border focus:ring-secondary-500" %>
-          <div>
-            <span class="text-white font-medium">Wife</span>
-            <p class="text-xs text-gray-500">Wife's expense</p>
-          </div>
-        </label>
+    <%# Fund Selection (if user has funds) %>
+    <% if @funds.present? && @funds.any? %>
+      <div class="input-group">
+        <%= f.label :fund_id, "Pay From", class: "input-label" %>
+        <%= f.select :fund_id,
+            options_for_select(
+              @funds.map { |fund| ["#{fund.name} (₹#{number_with_precision(fund.remaining_balance, precision: 0, delimiter: ',')} left)", fund.id] },
+              expense.fund_id
+            ),
+            { include_blank: "Personal (No Fund)" },
+            class: "select" %>
+        <p class="text-xs text-gray-500 mt-1">Select a fund to deduct from, or leave empty for personal expense</p>
       </div>
-    </div>
+    <% end %>
   </div>
 
-  <%# Note %>
+  <%# Note Field %>
   <div class="input-group">
     <%= f.label :note, class: "input-label" %>
-    <%= f.text_area :note, rows: 3, placeholder: "Add any additional details about this expense...", class: "textarea" %>
+    <%= f.text_area :note, 
+        placeholder: "Add any additional details about this expense...",
+        rows: 3,
+        class: "textarea" %>
   </div>
 
   <%# Form Actions %>
@@ -89,31 +73,3 @@
     <%= link_to "Cancel", root_path, class: "btn-secondary btn-lg" %>
   </div>
 <% end %>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const categorySelect = document.getElementById('category-select');
-    const customCategory = document.getElementById('custom-category');
-    
-    if (customCategory && categorySelect) {
-      customCategory.addEventListener('input', function() {
-        if (this.value.trim() !== '') {
-          categorySelect.value = '';
-          categorySelect.name = '';
-          this.name = 'expense[category]';
-        }
-      });
-      
-      categorySelect.addEventListener('change', function() {
-        if (this.value !== '') {
-          customCategory.value = '';
-          customCategory.name = '';
-          this.name = 'expense[category]';
-        }
-      });
-      
-      // Set initial state
-      categorySelect.name = 'expense[category]';
-    }
-  });
-</script>

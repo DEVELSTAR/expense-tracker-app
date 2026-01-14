@@ -2,78 +2,110 @@
 
 # This file should ensure the existence of records required to run the application in every environment (production,
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
 puts "🌱 Seeding database..."
 
-# Create Users
-puts "Creating users..."
-
-husband = User.find_or_create_by!(email: "john@example.com") do |user|
-  user.name = "John Doe"
-  user.password = "password123"
-  user.password_confirmation = "password123"
+# Create Admin user (only via seed, no API)
+puts "\nCreating admin user..."
+admin = User.find_or_initialize_by(email: "admin@expensetracker.com")
+if admin.new_record?
+  admin.name = "Admin"
+  admin.password = "admin123456"
+  admin.password_confirmation = "admin123456"
+  admin.admin = true
+  admin.save!
+  puts "  ✓ Created admin: Admin (admin@expensetracker.com)"
+else
+  # Update existing admin to ensure admin flag is set
+  admin.update!(admin: true) unless admin.admin?
+  puts "  ✓ Admin already exists: #{admin.email}"
 end
-puts "  ✓ Created user: #{husband.name} (#{husband.email})"
 
-wife = User.find_or_create_by!(email: "jane@example.com") do |user|
-  user.name = "Jane Doe"
-  user.password = "password123"
-  user.password_confirmation = "password123"
+# Create sample users
+puts "\nCreating sample users..."
+users_data = [
+  { name: "Rahul Sharma", email: "rahul@example.com", password: "password123" },
+  { name: "Priya Sharma", email: "priya@example.com", password: "password123" }
+]
+
+users = users_data.map do |user_data|
+  user = User.find_or_initialize_by(email: user_data[:email])
+  if user.new_record?
+    user.name = user_data[:name]
+    user.password = user_data[:password]
+    user.password_confirmation = user_data[:password]
+    user.admin = false
+    user.save!
+    puts "  ✓ Created user: #{user.name} (#{user.email})"
+  else
+    puts "  ✓ User already exists: #{user.email}"
+  end
+  user
 end
-puts "  ✓ Created user: #{wife.name} (#{wife.email})"
 
-# Create Expenses for the current month
+rahul, priya = users
+
+# Create sample fund
+puts "\nCreating sample fund..."
+fund = Fund.find_or_initialize_by(name: "Monthly Household")
+if fund.new_record?
+  fund.amount = 50000.00
+  fund.admin = admin
+  fund.save!
+  puts "  ✓ Created fund: #{fund.name} (₹#{fund.amount})"
+  
+  # Assign users to fund
+  [rahul, priya].each do |user|
+    FundUser.find_or_create_by!(fund: fund, user: user)
+    puts "    → Assigned #{user.name} to #{fund.name}"
+  end
+else
+  puts "  ✓ Fund already exists: #{fund.name}"
+end
+
+# Create sample expenses
 puts "\nCreating sample expenses..."
 
-current_month_start = Date.current.beginning_of_month
-last_month_start = 1.month.ago.beginning_of_month
+current_month = Date.current
+last_month = Date.current.last_month
 
 expenses_data = [
-  # Current month expenses
-  { amount: 156.75, spent_by: :self_expense, category: "groceries", note: "Weekly groceries from Whole Foods", spent_on: current_month_start + 2.days },
-  { amount: 1850.00, spent_by: :self_expense, category: "rent", note: "Monthly rent payment", spent_on: current_month_start + 1.day },
-  { amount: 45.00, spent_by: :wife, category: "shopping", note: "New shoes", spent_on: current_month_start + 3.days },
-  { amount: 120.00, spent_by: :self_expense, category: "bills", note: "Electricity bill", spent_on: current_month_start + 5.days },
-  { amount: 89.99, spent_by: :wife, category: "shopping", note: "Birthday gift for mom", spent_on: current_month_start + 6.days },
-  { amount: 65.50, spent_by: :self_expense, category: "travel", note: "Gas for the car", spent_on: current_month_start + 7.days },
-  { amount: 32.00, spent_by: :wife, category: "groceries", note: "Fresh produce from farmer's market", spent_on: current_month_start + 8.days },
-  { amount: 85.00, spent_by: :self_expense, category: "bills", note: "Internet bill", spent_on: current_month_start + 10.days },
-  { amount: 200.00, spent_by: :wife, category: "shopping", note: "Winter jacket", spent_on: current_month_start + 11.days },
-  { amount: 55.00, spent_by: :self_expense, category: "travel", note: "Uber rides this week", spent_on: current_month_start + 12.days },
-
-  # Last month expenses
-  { amount: 142.30, spent_by: :self_expense, category: "groceries", note: "Weekly groceries", spent_on: last_month_start + 5.days },
-  { amount: 1850.00, spent_by: :self_expense, category: "rent", note: "Monthly rent payment", spent_on: last_month_start + 1.day },
-  { amount: 78.00, spent_by: :wife, category: "shopping", note: "Kitchen supplies", spent_on: last_month_start + 8.days },
-  { amount: 250.00, spent_by: :self_expense, category: "travel", note: "Weekend trip to the coast", spent_on: last_month_start + 15.days },
-  { amount: 95.00, spent_by: :self_expense, category: "bills", note: "Phone bill", spent_on: last_month_start + 12.days },
-  { amount: 180.00, spent_by: :wife, category: "other", note: "Gym membership", spent_on: last_month_start + 10.days },
-  { amount: 45.00, spent_by: :self_expense, category: "groceries", note: "Snacks for movie night", spent_on: last_month_start + 20.days },
-  { amount: 320.00, spent_by: :wife, category: "shopping", note: "New laptop bag and accessories", spent_on: last_month_start + 22.days },
+  # Rahul's current month expenses from fund
+  { user: rahul, fund: fund, amount: 2500.00, category: "groceries", note: "Weekly vegetables and fruits", spent_on: current_month.beginning_of_month + 5.days },
+  { user: rahul, fund: fund, amount: 1500.00, category: "travel", note: "Uber rides this week", spent_on: current_month.beginning_of_month + 10.days },
+  { user: rahul, fund: fund, amount: 3200.00, category: "bills", note: "Electricity bill", spent_on: current_month.beginning_of_month + 7.days },
+  { user: rahul, fund: fund, amount: 4500.00, category: "shopping", note: "New clothes from mall", spent_on: current_month.beginning_of_month + 12.days },
+  
+  # Priya's current month expenses from fund
+  { user: priya, fund: fund, amount: 1800.00, category: "groceries", note: "Fresh produce from market", spent_on: current_month.beginning_of_month + 3.days },
+  { user: priya, fund: fund, amount: 2200.00, category: "shopping", note: "Books and stationery", spent_on: current_month.beginning_of_month + 8.days },
+  { user: priya, fund: fund, amount: 800.00, category: "travel", note: "Metro recharge", spent_on: current_month.beginning_of_month + 6.days },
+  { user: priya, fund: fund, amount: 5000.00, category: "other", note: "Birthday gift for mom", spent_on: current_month.beginning_of_month + 11.days },
+  
+  # Last month expenses from fund
+  { user: rahul, fund: fund, amount: 2800.00, category: "groceries", note: "Monthly groceries", spent_on: last_month.beginning_of_month + 4.days },
+  { user: priya, fund: fund, amount: 6500.00, category: "shopping", note: "Online shopping", spent_on: last_month.beginning_of_month + 15.days }
 ]
 
 expenses_data.each do |expense_data|
-  expense = husband.expenses.create!(expense_data)
-  puts "  ✓ Added expense: $#{format('%.2f', expense.amount)} - #{expense.category} (#{expense.spent_by_label})"
-end
-
-# Also create a few expenses for the wife's account
-wife_expenses = [
-  { amount: 42.50, spent_by: :wife, category: "groceries", note: "Organic vegetables", spent_on: current_month_start + 4.days },
-  { amount: 75.00, spent_by: :self_expense, category: "other", note: "Book club subscription", spent_on: current_month_start + 9.days },
-  { amount: 28.00, spent_by: :wife, category: "travel", note: "Bus pass", spent_on: current_month_start + 2.days },
-]
-
-wife_expenses.each do |expense_data|
-  expense = wife.expenses.create!(expense_data)
-  puts "  ✓ Added expense for #{wife.name}: $#{format('%.2f', expense.amount)} - #{expense.category}"
+  expense = expense_data[:user].expenses.create!(
+    amount: expense_data[:amount],
+    category: expense_data[:category],
+    note: expense_data[:note],
+    spent_on: expense_data[:spent_on],
+    fund: expense_data[:fund]
+  )
+  puts "  ✓ Added expense: ₹#{format('%.2f', expense.amount)} - #{expense.category} (#{expense.user.name}) [#{expense.fund_name}]"
 end
 
 puts "\n✅ Seeding complete!"
 puts "\n📊 Summary:"
-puts "  Users: #{User.count}"
+puts "  Users: #{User.count} (#{User.admins.count} admin, #{User.non_admins.count} regular)"
+puts "  Funds: #{Fund.count}"
+puts "  Total Fund Amount: ₹#{Fund.sum(:amount)}"
 puts "  Expenses: #{Expense.count}"
+puts "  Total Expenses: ₹#{Expense.sum(:amount)}"
 puts "\n🔐 Login credentials:"
-puts "  Husband: john@example.com / password123"
-puts "  Wife: jane@example.com / password123"
+puts "  Admin: admin@expensetracker.com / admin123456"
+puts "  User 1: rahul@example.com / password123"
+puts "  User 2: priya@example.com / password123"
