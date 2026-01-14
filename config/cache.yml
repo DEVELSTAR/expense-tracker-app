@@ -11,6 +11,7 @@ development:
 test:
   <<: *default
 
+# For production on Render free tier, we use memory_store instead of solid_cache
+# This is configured in config/environments/production.rb
 production:
-  database: cache
   <<: *default

@@ -26,9 +26,12 @@ gem "devise"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
-gem "solid_cache"
-gem "solid_queue"
-gem "solid_cable"
+# NOTE: These require multiple database configurations. For Render free tier,
+# we use simpler in-process adapters instead (memory_store, async).
+# Uncomment these for production deployments with multiple databases or Redis.
+# gem "solid_cache"
+# gem "solid_queue"
+# gem "solid_cable"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
