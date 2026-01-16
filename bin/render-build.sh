@@ -19,6 +19,6 @@ bundle exec rails db:migrate
 
 # Optionally seed the database on first deploy
 # Uncomment the following lines if you want to seed on deploy:
-# if [ "$RENDER_EXTERNAL_URL" ]; then
-#   bundle exec rails db:seed
-# fi
+if [ "$RENDER_EXTERNAL_URL" ]; then
+  bundle exec rails db:seed
+fi
