@@ -1,0 +1,29 @@
+<%= form_with(model: category, class: "contents") do |form| %>
+  <% if category.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2><%= pluralize(category.errors.count, "error") %> prohibited this category from being saved:</h2>
+
+      <ul>
+        <% category.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :name, class: "input-label" %>
+    <%= form.text_field :name, class: "input" %>
+  </div>
+
+  <% if current_user.admin? %>
+    <div class="my-5 flex items-center gap-2">
+      <%= form.check_box :global, class: "checkbox" %>
+      <%= form.label :global, "Global Category (Available to everyone)", class: "text-gray-300" %>
+    </div>
+  <% end %>
+
+  <div class="inline">
+    <%= form.submit class: "btn-primary w-full md:w-auto" %>
+  </div>
+<% end %>

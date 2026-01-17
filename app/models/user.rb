@@ -2,18 +2,19 @@
 
 class User < ApplicationRecord
   # Roles
-  ROLES = %w[admin guardian dependent].freeze
+  ROLES = %w[admin guardian dependent independent].freeze
 
   # Virtual attribute for guardian UID input during registration
   attr_accessor :guardian_uid_input
 
   # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  # :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable, :confirmable
 
   # Associations
   has_many :expenses, dependent: :destroy
+  has_many :recurring_expenses, dependent: :destroy
   has_many :fund_users, dependent: :destroy
   has_many :funds, through: :fund_users
   has_many :managed_funds, class_name: "Fund", foreign_key: :admin_id, dependent: :destroy
@@ -31,14 +32,14 @@ class User < ApplicationRecord
   # Dependent must have a guardian
   validates :guardian, presence: { message: "UID is invalid or not found" }, if: :dependent?
   validate :guardian_must_be_guardian_role, if: :dependent?
-  validate :guardian_cannot_have_guardian, unless: :dependent?
+  validate :guardian_cannot_have_guardian, if: :guardian?
 
   # Scopes
   scope :admins, -> { where(role: "admin") }
   scope :guardians, -> { where(role: "guardian") }
   scope :dependents_role, -> { where(role: "dependent") }
   scope :non_admins, -> { where.not(role: "admin") }
-  scope :registerable, -> { where(role: %w[guardian dependent]) }
+  scope :registerable, -> { where(role: %w[guardian dependent independent]) }
 
   # Callbacks
   before_validation :set_default_role, on: :create
@@ -59,9 +60,13 @@ class User < ApplicationRecord
     role == "dependent"
   end
 
+  def independent?
+    role == "independent"
+  end
+
   # Check if user can register (admin cannot sign up)
   def self.registerable_roles
-    %w[guardian dependent]
+    %w[independent]
   end
 
   # Find a guardian by their UID
@@ -119,7 +124,8 @@ class User < ApplicationRecord
   private
 
   def set_default_role
-    self.role ||= "dependent"
+    # Set default role to independent if not specified
+    self.role ||= "independent"
   end
 
   # Look up guardian by UID input

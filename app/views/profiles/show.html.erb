@@ -46,6 +46,13 @@
             <% if @user.guardian.present? %>
               <span class="text-xs text-gray-500">(Guardian: <%= @user.guardian.display_name %>)</span>
             <% end %>
+          <% when "independent" %>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/10 text-gray-400 border border-gray-500/20">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+              Independent
+            </span>
           <% end %>
         </div>
       </div>
@@ -132,6 +139,47 @@
           });
         }
       </script>
+    <% end %>
+
+    <%# Role Management (for New Users) %>
+    <% if @user.independent? %>
+      <div class="card p-6 md:p-8 mb-6 border border-primary-500/20">
+        <h3 class="text-lg font-semibold text-white mb-4">Setup Family Role</h3>
+        <p class="text-gray-400 mb-6">You are currently independent. You can switch to a family role at any time.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <%# Guardian Option %>
+            <div class="p-4 rounded-xl bg-dark-surface-elevated border border-emerald-500/20 hover:border-emerald-500/40 transition-colors">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-white">Become Guardian</h4>
+                </div>
+                <p class="text-sm text-gray-400 mb-4 h-10">Create funds and manage expenses for family members.</p>
+                <%= button_to "Switch to Guardian", become_guardian_onboarding_index_path, method: :post, class: "btn-primary btn-sm w-full justify-center" %>
+            </div>
+
+            <%# Dependent Option %>
+            <div class="p-4 rounded-xl bg-dark-surface-elevated border border-blue-500/20 hover:border-blue-500/40 transition-colors">
+                 <div class="flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-white">Join Family</h4>
+                 </div>
+                 <p class="text-sm text-gray-400 mb-4 h-10">Link to an existing Guardian using their UID.</p>
+                 <%= form_with url: become_dependent_onboarding_index_path, method: :post, class: "space-y-3" do |f| %>
+                  <%= f.text_field :guardian_uid_input, placeholder: "Enter Guardian UID", class: "input input-sm text-center uppercase tracking-wider font-mono", required: true %>
+                  <%= f.submit "Link & Switch", class: "btn-secondary btn-sm w-full" %>
+                 <% end %>
+            </div>
+        </div>
+      </div>
     <% end %>
 
     <%# Account Actions %>

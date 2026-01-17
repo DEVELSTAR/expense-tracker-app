@@ -10,14 +10,18 @@ class DashboardController < ApplicationController
       return
     end
 
-    @current_month = params[:month].present? ? Date.parse(params[:month]) : Date.current
+    begin
+      @current_month = params[:month].present? ? Date.parse(params[:month]) : Date.current
+    rescue Date::Error
+      @current_month = Date.current
+    end
 
     # User's expenses for the current month
     expenses_base = current_user.expenses.by_month(@current_month)
 
     # Calculate aggregations
     @monthly_total = expenses_base.sum(:amount)
-    @category_totals = expenses_base.group(:category).sum(:amount)
+    @category_totals = expenses_base.joins(:category).group("categories.name").sum(:amount)
 
     # Get sorted expenses list for display
     @expenses = expenses_base.includes(:fund).recent
@@ -29,6 +33,12 @@ class DashboardController < ApplicationController
     # Split into Personal (created by user) and Assigned (created by admin/others)
     @personal_funds = all_funds.select { |f| f.admin_id == current_user.id }
     @assigned_funds = all_funds.select { |f| f.admin_id != current_user.id }
+
+    # Find funds that need attention (low balance)
+    @funds_needing_attention = all_funds.select do |fund|
+      spent_percent = fund.amount > 0 ? (fund.total_spent / fund.amount * 100) : 0
+      spent_percent >= 75 || fund.remaining_balance <= 0
+    end
 
     # For guardians, show dependents overview
     if current_user.guardian?

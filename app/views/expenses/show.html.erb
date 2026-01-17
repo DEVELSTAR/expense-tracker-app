@@ -37,8 +37,8 @@
         <div>
           <label class="text-sm text-gray-500 uppercase tracking-wide">Category</label>
           <p class="mt-1">
-            <span class="category-<%= @expense.category.downcase.gsub(/\s+/, '-') %>">
-              <%= @expense.category.capitalize %>
+            <span class="category-<%= @expense.category.name.downcase.gsub(/\s+/, '-') %>">
+              <%= @expense.category.name.capitalize %>
             </span>
           </p>
         </div>
@@ -57,6 +57,46 @@
         <div>
           <label class="text-sm text-gray-500 uppercase tracking-wide">Note</label>
           <p class="mt-1 text-gray-300 whitespace-pre-wrap"><%= @expense.note %></p>
+        </div>
+      <% end %>
+
+      <%# Receipt %>
+      <% if @expense.has_receipt? %>
+        <div>
+          <label class="text-sm text-gray-500 uppercase tracking-wide">Receipt</label>
+          <div class="mt-2 p-4 rounded-xl bg-dark-surface-elevated border border-dark-border">
+            <% if @expense.receipt.image? %>
+              <div class="text-center">
+                <%= image_tag url_for(@expense.receipt), class: "max-w-full max-h-96 rounded-lg mx-auto" %>
+                <%= link_to url_for(@expense.receipt), target: "_blank", class: "inline-flex items-center gap-2 mt-3 text-sm text-primary-400 hover:text-primary-300" do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                  Open full size
+                <% end %>
+              </div>
+            <% else %>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-white font-medium"><%= @expense.receipt.filename %></p>
+                    <p class="text-xs text-gray-500">PDF Document</p>
+                  </div>
+                </div>
+                <%= link_to rails_blob_path(@expense.receipt, disposition: :attachment), class: "btn-secondary btn-sm" do %>
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                  </svg>
+                  Download
+                <% end %>
+              </div>
+            <% end %>
+          </div>
         </div>
       <% end %>
 

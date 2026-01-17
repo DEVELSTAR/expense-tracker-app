@@ -73,8 +73,8 @@
       document.addEventListener('DOMContentLoaded', dismissFlashMessages);
     </script>
 
-    <%# Main Content %>
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+    <%# Main Content - Extra bottom padding on mobile for bottom nav %>
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 sm:pb-12">
       <%= yield %>
     </main>
 

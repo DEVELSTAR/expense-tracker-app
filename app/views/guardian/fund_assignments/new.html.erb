@@ -1,0 +1,82 @@
+<% content_for :title, "Assign User to #{@fund.name} - ExpenseTracker" %>
+
+<div class="max-w-2xl mx-auto animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Assign User to Fund</h1>
+      <p class="page-subtitle">Select a user to give access to "<%= @fund.name %>"</p>
+    </div>
+    <%= link_to fund_path(@fund), class: "btn-secondary" do %>
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Back to Fund
+    <% end %>
+  </div>
+
+  <div class="card p-6 md:p-8">
+    <% if @available_users.any? %>
+      <p class="text-gray-400 mb-6">Select a user below to grant them access to spend from this fund:</p>
+      
+      <div class="space-y-3">
+        <% @available_users.each do |user| %>
+          <%= form_with url: guardian_fund_fund_assignments_path(@fund), method: :post, class: "block" do %>
+            <%= hidden_field_tag :user_id, user.id %>
+            <button type="submit" class="w-full flex items-center justify-between p-4 rounded-xl bg-dark-surface-elevated hover:bg-dark-border transition-colors text-left group">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br <%= user.id == current_user.id ? 'from-emerald-500 to-teal-500' : 'from-blue-500 to-indigo-500' %> flex items-center justify-center text-white font-bold">
+                  <%= user.display_name.first.upcase %>
+                </div>
+                <div>
+                  <p class="text-white font-medium">
+                    <%= user.display_name %>
+                    <% if user.id == current_user.id %>
+                      <span class="text-xs text-emerald-400">(You)</span>
+                    <% end %>
+                  </p>
+                  <p class="text-sm text-gray-400"><%= user.email %></p>
+                  <p class="text-xs text-gray-500"><%= user.role_label %></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="text-sm">Assign</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+              </div>
+            </button>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-8">
+        <div class="w-16 h-16 rounded-full bg-gray-500/10 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+        </div>
+        <p class="text-gray-400 mb-2">No more users to assign</p>
+        <p class="text-sm text-gray-500 mb-4">All your dependents are already assigned to this fund.</p>
+        <%= link_to fund_path(@fund), class: "btn-secondary" do %>
+          Back to Fund
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Info Box %>
+  <div class="mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+    <div class="flex gap-3">
+      <svg class="w-5 h-5 text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <div>
+        <p class="text-blue-400 font-medium">About Fund Assignments</p>
+        <p class="text-sm text-blue-300/70 mt-1">
+          When you assign a user to a fund, they can create expenses from that fund. 
+          You'll be able to see all expenses they make. You can remove their access at any time from the fund details page.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

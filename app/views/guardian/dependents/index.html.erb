@@ -1,0 +1,68 @@
+<% content_for :title, "My Dependents - ExpenseTracker" %>
+
+<div class="max-w-4xl mx-auto animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">My Dependents</h1>
+      <p class="page-subtitle">View all users linked to your Guardian UID</p>
+    </div>
+  </div>
+
+  <% if @dependents.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <% @dependents.each do |dependent| %>
+        <%= link_to guardian_dependent_path(dependent), class: "card p-6 hover:border-blue-500/30 transition-colors block" do %>
+          <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-500/25">
+              <%= dependent.display_name.first.upcase %>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-white"><%= dependent.display_name %></h3>
+              <p class="text-sm text-gray-400"><%= dependent.email %></p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  Dependent
+                </span>
+                <span class="text-xs text-gray-500">
+                  Joined <%= time_ago_in_words(dependent.created_at) %> ago
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-dark-border">
+            <div class="text-center">
+              <p class="text-lg font-bold text-white"><%= dependent.expenses.count %></p>
+              <p class="text-xs text-gray-400">Expenses</p>
+            </div>
+            <div class="text-center">
+              <p class="text-lg font-bold text-primary-400">₹<%= number_with_precision(dependent.expenses.sum(:amount), precision: 0, delimiter: ",") %></p>
+              <p class="text-xs text-gray-400">Total Spent</p>
+            </div>
+            <div class="text-center">
+              <p class="text-lg font-bold text-secondary-400"><%= dependent.funds.count %></p>
+              <p class="text-xs text-gray-400">Funds</p>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card p-8 text-center">
+      <div class="w-20 h-20 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+        </svg>
+      </div>
+      <h3 class="text-xl font-semibold text-white mb-2">No Dependents Yet</h3>
+      <p class="text-gray-400 mb-4">Share your Guardian UID with family members so they can register as your dependents.</p>
+      
+      <div class="inline-block p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 mb-4">
+        <p class="text-xs text-gray-400 mb-1">Your Guardian UID</p>
+        <p class="text-2xl font-bold font-mono tracking-wider text-emerald-400"><%= current_user.guardian_uid %></p>
+      </div>
+      
+      <p class="text-sm text-gray-500">When someone signs up as a Dependent and enters your UID, they'll appear here.</p>
+    </div>
+  <% end %>
+</div>
