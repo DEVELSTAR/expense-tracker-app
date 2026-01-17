@@ -1,0 +1,50 @@
+<% content_for :title, "Shopping List" %>
+
+<div class="animate-fade-in max-w-2xl mx-auto">
+  <div class="page-header mb-8">
+    <div>
+      <h1 class="page-title">Shopping List</h1>
+      <p class="page-subtitle">Keep track of things you need to buy.</p>
+    </div>
+  </div>
+
+  <div class="card p-6 mb-8">
+    <%= form_with(model: @new_item || ShoppingListItem.new, class: "flex gap-4") do |form| %>
+      <div class="flex-1">
+        <%= form.text_field :name, class: "input w-full", placeholder: "Add new item...", autocomplete: "off", required: true %>
+      </div>
+      <%= form.submit "Add", class: "btn-primary px-6" %>
+    <% end %>
+  </div>
+
+  <div class="space-y-3">
+    <% @shopping_list_items.each do |item| %>
+      <div class="card p-4 flex items-center justify-between group transition-all <%= 'opacity-60' if item.completed? %>">
+        <div class="flex items-center gap-4">
+          <%= button_to toggle_shopping_list_item_path(item), method: :patch, class: "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors #{item.completed? ? 'bg-primary-500 border-primary-500 text-white' : 'border-gray-500 hover:border-primary-400'}" do %>
+            <% if item.completed? %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <% end %>
+          <% end %>
+          <span class="text-white font-medium <%= 'line-through text-gray-500' if item.completed? %>">
+            <%= item.name %>
+          </span>
+        </div>
+        
+        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+           <%= link_to "Edit", edit_shopping_list_item_path(item), class: "text-xs text-gray-400 hover:text-white" %>
+           
+           <%= button_to shopping_list_item_path(item), method: :delete, form: { data: { turbo_confirm: "Remove this item?" } }, class: "text-gray-400 hover:text-red-400 transition-colors" do %>
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+           <% end %>
+        </div>
+      </div>
+    <% end %>
+    
+    <% if @shopping_list_items.empty? %>
+      <div class="text-center py-12 text-gray-500">
+        Your list is empty. Add something above!
+      </div>
+    <% end %>
+  </div>
+</div>

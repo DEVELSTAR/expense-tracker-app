@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :shopping_list_items do
+    patch :toggle, on: :member
+  end
   resources :categories
   # Authentication
   # Authentication
@@ -10,7 +13,7 @@ Rails.application.routes.draw do
   }
 
   # Onboarding
-  resources :onboarding, only: [:index] do
+  resources :onboarding, only: [ :index ] do
     collection do
       post :become_guardian
       post :become_dependent

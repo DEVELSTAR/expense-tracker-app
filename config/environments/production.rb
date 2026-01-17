@@ -83,7 +83,8 @@ Rails.application.configure do
   # Allow Render's external URL
   config.hosts = [
     ENV["RENDER_EXTERNAL_HOSTNAME"],     # Allow requests from Render's hostname
-    /.*\.onrender\.com/                   # Allow requests from all Render subdomains
+    /.*\.onrender\.com/,                 # Allow requests from all Render subdomains
+    "expenses.akibworks.in"              # Allow custom domain
   ].compact
 
   # Skip DNS rebinding protection for the default health check endpoint.

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_17_140821) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_17_181928) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -122,6 +122,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_17_140821) do
     t.index ["user_id"], name: "index_recurring_expenses_on_user_id"
   end
 
+  create_table "shopping_list_items", force: :cascade do |t|
+    t.boolean "completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_shopping_list_items_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.datetime "confirmation_sent_at"
@@ -161,5 +170,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_17_140821) do
   add_foreign_key "recurring_expenses", "categories"
   add_foreign_key "recurring_expenses", "funds"
   add_foreign_key "recurring_expenses", "users"
+  add_foreign_key "shopping_list_items", "users"
   add_foreign_key "users", "users", column: "guardian_id"
 end

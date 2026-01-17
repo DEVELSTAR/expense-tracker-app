@@ -10,7 +10,7 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable, :confirmable
+         :recoverable, :rememberable, :validatable
 
   # Associations
   has_many :expenses, dependent: :destroy
@@ -18,6 +18,7 @@ class User < ApplicationRecord
   has_many :fund_users, dependent: :destroy
   has_many :funds, through: :fund_users
   has_many :managed_funds, class_name: "Fund", foreign_key: :admin_id, dependent: :destroy
+  has_many :shopping_list_items, dependent: :destroy
 
   # Guardian-Dependent relationship
   belongs_to :guardian, class_name: "User", optional: true

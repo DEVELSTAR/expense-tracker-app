@@ -1,9 +1,8 @@
-<%= form_with(model: category, class: "contents") do |form| %>
+<%= form_with(model: category, class: "space-y-6") do |form| %>
   <% if category.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
-      <h2><%= pluralize(category.errors.count, "error") %> prohibited this category from being saved:</h2>
-
-      <ul>
+    <div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
+      <h2 class="text-red-400 font-medium mb-2"><%= pluralize(category.errors.count, "error") %> prohibited this category from being saved:</h2>
+      <ul class="list-disc list-inside text-sm text-red-400">
         <% category.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,19 +10,23 @@
     </div>
   <% end %>
 
-  <div class="my-5">
-    <%= form.label :name, class: "input-label" %>
-    <%= form.text_field :name, class: "input" %>
+  <div>
+    <%= form.label :name, class: "block text-sm font-medium text-gray-300 mb-1" %>
+    <%= form.text_field :name, class: "input w-full", placeholder: "e.g. Groceries", autofocus: true, required: true %>
   </div>
 
   <% if current_user.admin? %>
-    <div class="my-5 flex items-center gap-2">
-      <%= form.check_box :global, class: "checkbox" %>
-      <%= form.label :global, "Global Category (Available to everyone)", class: "text-gray-300" %>
+    <div class="flex items-center gap-3 p-4 bg-dark-surface-elevated rounded-xl border border-dark-border cursor-pointer" onclick="this.querySelector('input[type=checkbox]').click()">
+      <%= form.check_box :global, class: "w-5 h-5 rounded border-gray-600 bg-dark-bg text-primary-500 focus:ring-primary-500 cursor-pointer" %>
+      <div>
+        <%= form.label :global, "Global Category", class: "block text-sm font-medium text-white cursor-pointer select-none pointer-events-none" %>
+        <p class="text-xs text-gray-400 pointer-events-none">Visible to all users in the system</p>
+      </div>
     </div>
   <% end %>
 
-  <div class="inline">
-    <%= form.submit class: "btn-primary w-full md:w-auto" %>
+  <div class="flex items-center gap-4 pt-4">
+    <%= form.submit class: "btn-primary w-full justify-center" %>
+    <%= link_to "Cancel", categories_path, class: "btn-ghost w-full justify-center text-gray-400 hover:text-white" %>
   </div>
 <% end %>
