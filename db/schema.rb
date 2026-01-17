@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_17_093820) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_17_140821) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,20 +52,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_17_093820) do
     t.datetime "updated_at", null: false
     t.string "user_agent"
     t.bigint "user_id", null: false
-    t.index ["trackable_type", "trackable_id"], name: "index_activity_logs_on_trackable"
+    t.index ["trackable_type", "trackable_id"], name: "index_activity_logs_on_trackable_type_and_trackable_id"
     t.index ["user_id"], name: "index_activity_logs_on_user_id"
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "global", default: false, null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
   create_table "expenses", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
-    t.string "category", null: false
+    t.bigint "category_id"
     t.datetime "created_at", null: false
     t.bigint "fund_id"
     t.text "note"
     t.date "spent_on", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.index ["category"], name: "index_expenses_on_category"
+    t.index ["category_id"], name: "index_expenses_on_category_id"
     t.index ["fund_id"], name: "index_expenses_on_fund_id"
     t.index ["spent_on"], name: "index_expenses_on_spent_on"
     t.index ["user_id"], name: "index_expenses_on_user_id"
@@ -97,7 +106,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_17_093820) do
   create_table "recurring_expenses", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.decimal "amount", precision: 12, scale: 2, null: false
-    t.string "category", null: false
+    t.bigint "category_id"
     t.datetime "created_at", null: false
     t.string "frequency", default: "monthly", null: false
     t.bigint "fund_id"
@@ -106,6 +115,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_17_093820) do
     t.text "note"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["category_id"], name: "index_recurring_expenses_on_category_id"
     t.index ["fund_id"], name: "index_recurring_expenses_on_fund_id"
     t.index ["next_run_date"], name: "index_recurring_expenses_on_next_run_date"
     t.index ["user_id", "active"], name: "index_recurring_expenses_on_user_id_and_active"
@@ -126,7 +136,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_17_093820) do
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
-    t.string "role", default: "dependent"
+    t.string "role", default: "independent"
     t.string "unconfirmed_email"
     t.datetime "updated_at", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
@@ -140,12 +150,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_17_093820) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activity_logs", "users"
+  add_foreign_key "categories", "users"
+  add_foreign_key "expenses", "categories"
   add_foreign_key "expenses", "funds"
   add_foreign_key "expenses", "users"
   add_foreign_key "fund_users", "funds"
   add_foreign_key "fund_users", "users"
   add_foreign_key "fund_users", "users", column: "assigned_by_id"
   add_foreign_key "funds", "users", column: "admin_id"
+  add_foreign_key "recurring_expenses", "categories"
   add_foreign_key "recurring_expenses", "funds"
   add_foreign_key "recurring_expenses", "users"
   add_foreign_key "users", "users", column: "guardian_id"

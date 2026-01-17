@@ -228,7 +228,7 @@
           <% @recent_expenses.each do |expense| %>
             <div class="flex items-center justify-between p-3 rounded-lg bg-dark-surface-elevated">
               <div>
-                <p class="text-white font-medium"><%= expense.category.titleize %></p>
+                <p class="text-white font-medium"><%= expense.category.name.titleize %></p>
                 <p class="text-xs text-gray-500"><%= expense.spent_on.strftime("%b %d") %> • <%= expense.fund_name %></p>
               </div>
               <p class="text-primary-400 font-medium"><%= expense.formatted_amount %></p>
@@ -254,7 +254,7 @@
           <% @dependent_expenses.each do |expense| %>
             <div class="flex items-center justify-between p-3 rounded-lg bg-dark-surface-elevated">
               <div>
-                <p class="text-white font-medium"><%= expense.category.titleize %></p>
+                <p class="text-white font-medium"><%= expense.category.name.titleize %></p>
                 <p class="text-xs text-gray-500">
                   <%= expense.user.display_name %> • <%= expense.spent_on.strftime("%b %d") %>
                 </p>

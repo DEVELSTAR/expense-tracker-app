@@ -84,7 +84,7 @@ class RecurringExpensesController < ApplicationController
   end
 
   def recurring_expense_params
-    params.require(:recurring_expense).permit(:name, :amount, :category, :note, :fund_id, :frequency, :next_run_date)
+    params.require(:recurring_expense).permit(:name, :amount, :category_id, :note, :fund_id, :frequency, :next_run_date)
   end
 
   def available_funds

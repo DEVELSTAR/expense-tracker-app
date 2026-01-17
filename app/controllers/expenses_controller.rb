@@ -128,7 +128,7 @@ class ExpensesController < ApplicationController
   end
 
   def expense_params
-    params.require(:expense).permit(:amount, :category, :note, :spent_on, :fund_id, :receipt)
+    params.require(:expense).permit(:amount, :category_id, :note, :spent_on, :fund_id, :receipt)
   end
 
   def redirect_admin!
@@ -162,7 +162,7 @@ class ExpensesController < ApplicationController
       expenses.each do |expense|
         csv << [
           expense.spent_on.strftime("%Y-%m-%d"),
-          expense.category.titleize,
+          expense.category&.name&.titleize || "Unknown",
           expense.amount.to_f,
           expense.fund&.name || "No Fund",
           expense.note || "",

@@ -3,6 +3,7 @@
 class RecurringExpense < ApplicationRecord
   belongs_to :user
   belongs_to :fund, optional: true
+  belongs_to :category
 
   # Frequencies
   FREQUENCIES = %w[daily weekly biweekly monthly quarterly yearly].freeze
@@ -10,7 +11,7 @@ class RecurringExpense < ApplicationRecord
   # Validations
   validates :name, presence: true, length: { maximum: 100 }
   validates :amount, presence: true, numericality: { greater_than: 0 }
-  validates :category, presence: true, inclusion: { in: Expense::CATEGORIES }
+  validates :category, presence: true
   validates :frequency, presence: true, inclusion: { in: FREQUENCIES }
   validates :next_run_date, presence: true
 

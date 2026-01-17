@@ -11,7 +11,7 @@ class FundsController < ApplicationController
     @funds = accessible_funds.includes(:users, :expenses).order(created_at: :desc)
 
     # Separate managed funds (created by user) and assigned funds
-    if current_user.guardian?
+    if current_user.guardian? || current_user.independent?
       @managed_funds = @funds.select { |f| f.admin_id == current_user.id }
       @assigned_funds = @funds.reject { |f| f.admin_id == current_user.id }
     else
@@ -65,10 +65,10 @@ class FundsController < ApplicationController
   private
 
   def accessible_funds
-    if current_user.guardian?
-      # Guardians can see their own funds + assigned funds
-      Fund.where(admin_id: current_user.id)
-          .or(Fund.joins(:fund_users).where(fund_users: { user_id: current_user.id }))
+    if current_user.guardian? || current_user.independent?
+      # Guardians and Independent users can see their own funds (admin) + assigned funds
+      Fund.left_joins(:fund_users)
+          .where("funds.admin_id = :user_id OR fund_users.user_id = :user_id", user_id: current_user.id)
           .distinct
     else
       # Dependents can only see funds assigned to them
@@ -89,7 +89,7 @@ class FundsController < ApplicationController
   end
 
   def authorize_fund_creation!
-    unless current_user.guardian?
+    unless current_user.guardian? || current_user.independent?
       redirect_to funds_path, alert: "Only guardians can create funds."
     end
   end

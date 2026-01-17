@@ -1,12 +1,21 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :categories
   # Authentication
   # Authentication
   devise_for :users, controllers: {
     registrations: "registrations",
     sessions: "sessions"
   }
+
+  # Onboarding
+  resources :onboarding, only: [:index] do
+    collection do
+      post :become_guardian
+      post :become_dependent
+    end
+  end
 
   # Dashboard (root)
   root "dashboard#index"

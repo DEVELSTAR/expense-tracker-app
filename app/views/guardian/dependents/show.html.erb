@@ -77,10 +77,10 @@
           <div class="p-4 flex items-center justify-between hover:bg-dark-surface-elevated/50 transition-colors">
             <div class="flex items-center gap-4">
               <div class="w-10 h-10 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-400">
-                <%= expense.category[0].upcase %>
+                <%= expense.category.name[0].upcase %>
               </div>
               <div>
-                <p class="font-medium text-white"><%= expense.category.titleize %></p>
+                <p class="font-medium text-white"><%= expense.category.name.titleize %></p>
                 <p class="text-sm text-gray-400">
                   <%= expense.spent_on.strftime("%b %d, %Y") %>
                   <% if expense.fund.present? %>

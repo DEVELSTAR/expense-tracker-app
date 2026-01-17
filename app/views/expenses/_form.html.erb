@@ -35,10 +35,11 @@
 
     <%# Category Field %>
     <div class="input-group">
-      <%= f.label :category, class: "input-label" %>
-      <%= f.select :category, 
-          options_for_select(Expense::CATEGORIES.map { |c| [c.capitalize, c] }, expense.category),
-          { include_blank: "Select category" },
+      <%= f.label :category_id, "Category", class: "input-label" %>
+      <%= f.collection_select :category_id, 
+          Category.available_to(current_user).order(:name), 
+          :id, :name, 
+          { include_blank: "Select category" }, 
           class: "select" %>
     </div>
 

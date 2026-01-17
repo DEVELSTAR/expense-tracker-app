@@ -64,8 +64,9 @@
         <%# Category %>
         <div class="input-group">
           <%= f.label :category, class: "input-label" %>
-          <%= f.select :category, 
-              options_for_select(Expense::CATEGORIES.map { |c| [c.capitalize, c] }, @recurring_expense.category),
+          <%= f.collection_select :category_id, 
+              Category.available_to(current_user).order(:name), 
+              :id, :name, 
               { include_blank: "Select category" },
               class: "select" %>
         </div>

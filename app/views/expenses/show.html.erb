@@ -37,8 +37,8 @@
         <div>
           <label class="text-sm text-gray-500 uppercase tracking-wide">Category</label>
           <p class="mt-1">
-            <span class="category-<%= @expense.category.downcase.gsub(/\s+/, '-') %>">
-              <%= @expense.category.capitalize %>
+            <span class="category-<%= @expense.category.name.downcase.gsub(/\s+/, '-') %>">
+              <%= @expense.category.name.capitalize %>
             </span>
           </p>
         </div>

@@ -75,6 +75,44 @@
         </div>
         <span class="text-sm text-gray-300">Recurring</span>
       <% end %>
+    <% elsif current_user.independent? %>
+      <%# Independent Quick Actions %>
+      <%= link_to new_expense_path, class: "card p-4 flex flex-col items-center gap-2 hover:border-primary-500/50 transition-colors group" do %>
+        <div class="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center group-hover:bg-primary-500/30 transition-colors">
+          <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+        </div>
+        <span class="text-sm text-gray-300">Add Expense</span>
+      <% end %>
+      
+      <%= link_to new_fund_path, class: "card p-4 flex flex-col items-center gap-2 hover:border-secondary-500/50 transition-colors group" do %>
+        <div class="w-10 h-10 rounded-xl bg-secondary-500/20 flex items-center justify-center group-hover:bg-secondary-500/30 transition-colors">
+          <svg class="w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <span class="text-sm text-gray-300">Create Fund</span>
+      <% end %>
+
+      <%= link_to recurring_expenses_path, class: "card p-4 flex flex-col items-center gap-2 hover:border-emerald-500/50 transition-colors group" do %>
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
+          <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+        </div>
+        <span class="text-sm text-gray-300">Recurring</span>
+      <% end %>
+      
+      <%= link_to profile_path, class: "card p-4 flex flex-col items-center gap-2 hover:border-gray-500/50 transition-colors group" do %>
+        <div class="w-10 h-10 rounded-xl bg-gray-500/20 flex items-center justify-center group-hover:bg-gray-500/30 transition-colors">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+        </div>
+        <span class="text-sm text-gray-300">My Profile</span>
+      <% end %>
+
     <% else %>
       <%# Dependent Quick Actions %>
       <%= link_to new_expense_path, class: "card p-4 flex flex-col items-center gap-2 hover:border-primary-500/50 transition-colors group" do %>
@@ -323,20 +361,6 @@
     </div>
   <% end %>
 
-  <%# Filters %>
-  <div class="filter-bar mb-8">
-    <%= form_with url: root_path, method: :get, class: "flex flex-wrap items-end gap-4 w-full", data: { turbo_frame: "_top" } do |f| %>
-      <div class="input-group flex-1 min-w-[200px]">
-        <%= f.label :month, "Month", class: "input-label" %>
-        <%= f.month_field :month, value: @current_month.strftime("%Y-%m"), class: "input", style: "border-radius: 12px;" %>
-      </div>
-      
-      <div class="flex items-center gap-3">
-        <button type="submit" class="btn-primary" style="border-radius: 12px; padding: 10px 20px;">Apply Filters</button>
-        <%= link_to "Reset", root_path, class: "btn-secondary", style: "border-radius: 12px; padding: 10px 20px;" %>
-      </div>
-    <% end %>
-  </div>
 
   <%# Stats Cards %>
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
@@ -428,7 +452,7 @@
                 </td>
                 <td>
                   <span class="text-xs px-2 py-1 rounded-full bg-primary-500/20 text-primary-300">
-                    <%= expense.category.capitalize %>
+                    <%= expense.category.name.capitalize %>
                   </span>
                 </td>
                 <td>

@@ -112,7 +112,7 @@
               <tr>
                 <td class="text-gray-300"><%= expense.spent_on.strftime("%b %d, %Y") %></td>
                 <td class="text-white"><%= expense.creator_name %></td>
-                <td><span class="text-xs px-2 py-1 rounded-full bg-primary-500/20 text-primary-300"><%= expense.category.capitalize %></span></td>
+                <td><span class="text-xs px-2 py-1 rounded-full bg-primary-500/20 text-primary-300"><%= expense.category.name.capitalize %></span></td>
                 <td class="text-gray-400 max-w-xs truncate"><%= expense.note.presence || "—" %></td>
                 <td class="text-right text-red-400 font-medium">-<%= expense.formatted_amount %></td>
               </tr>

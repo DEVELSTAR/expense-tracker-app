@@ -12,7 +12,7 @@
         <% end %>
       </p>
     </div>
-    <% if current_user.guardian? %>
+    <% if current_user.guardian? || current_user.independent? %>
       <%= link_to new_fund_path, class: "btn-primary btn-lg inline-flex items-center gap-2" do %>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -23,7 +23,7 @@
   </div>
 
   <%# My Created Funds (Guardians Only) %>
-  <% if current_user.guardian? && @managed_funds.any? %>
+  <% if (current_user.guardian? || current_user.independent?) && @managed_funds.any? %>
     <div class="mb-8">
       <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
         <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,27 +153,27 @@
   <% if @managed_funds.empty? && @assigned_funds.empty? %>
     <div class="empty-state">
       <div class="empty-state-icon">
-        <% if current_user.guardian? %>
+        <% if current_user.guardian? || current_user.independent? %>
           🏦
         <% else %>
           💰
         <% end %>
       </div>
       <h3 class="empty-state-title">
-        <% if current_user.guardian? %>
+        <% if current_user.guardian? || current_user.independent? %>
           No Funds Created
         <% else %>
           No Funds Assigned
         <% end %>
       </h3>
       <p class="empty-state-description">
-        <% if current_user.guardian? %>
+        <% if current_user.guardian? || current_user.independent? %>
           Create a fund to manage specific budgets like "Groceries", "Travel", or "Emergency".
         <% else %>
           Your guardian hasn't assigned any funds to you yet. Contact them to get access to spending funds.
         <% end %>
       </p>
-      <% if current_user.guardian? %>
+      <% if current_user.guardian? || current_user.independent? %>
         <%= link_to new_fund_path, class: "btn-primary inline-flex items-center gap-2" do %>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>

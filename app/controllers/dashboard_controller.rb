@@ -10,14 +10,18 @@ class DashboardController < ApplicationController
       return
     end
 
-    @current_month = params[:month].present? ? Date.parse(params[:month]) : Date.current
+    begin
+      @current_month = params[:month].present? ? Date.parse(params[:month]) : Date.current
+    rescue Date::Error
+      @current_month = Date.current
+    end
 
     # User's expenses for the current month
     expenses_base = current_user.expenses.by_month(@current_month)
 
     # Calculate aggregations
     @monthly_total = expenses_base.sum(:amount)
-    @category_totals = expenses_base.group(:category).sum(:amount)
+    @category_totals = expenses_base.joins(:category).group("categories.name").sum(:amount)
 
     # Get sorted expenses list for display
     @expenses = expenses_base.includes(:fund).recent

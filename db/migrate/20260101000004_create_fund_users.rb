@@ -3,10 +3,10 @@ class CreateFundUsers < ActiveRecord::Migration[8.1]
     create_table :fund_users do |t|
       t.references :fund, null: false, foreign_key: true
       t.references :user, null: false, foreign_key: true
-
+      t.references :assigned_by, foreign_key: { to_table: :users }
+      t.datetime :assigned_at
       t.timestamps
     end
-
-    add_index :fund_users, [:fund_id, :user_id], unique: true
+    add_index :fund_users, [ :fund_id, :user_id ], unique: true
   end
 end

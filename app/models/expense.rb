@@ -3,6 +3,7 @@
 class Expense < ApplicationRecord
   belongs_to :user
   belongs_to :fund, optional: true
+  belongs_to :category # Replaces string column
 
   # Receipt attachment
   has_one_attached :receipt
@@ -10,12 +11,9 @@ class Expense < ApplicationRecord
   # Validate receipt file type and size
   validate :acceptable_receipt
 
-  # Predefined categories
-  CATEGORIES = %w[groceries rent travel shopping bills other].freeze
-
   # Validations
   validates :amount, presence: true, numericality: { greater_than: 0 }
-  validates :category, presence: true
+  validates :category, presence: true # Validates association presence
   validates :spent_on, presence: true
   validate :amount_within_fund_balance, if: -> { fund.present? }
 

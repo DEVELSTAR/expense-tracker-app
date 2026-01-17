@@ -38,7 +38,7 @@
                   </svg>
                 </div>
                 <div>
-                  <p class="text-white font-medium"><%= expense.category.titleize %></p>
+                  <p class="text-white font-medium"><%= expense.category&.name&.titleize %></p>
                   <p class="text-sm text-gray-400">
                     <%= expense.spent_on.strftime("%b %d, %Y") %>
                     <% if expense.fund.present? %>
@@ -90,7 +90,7 @@
                   <%= expense.user.display_name.first.upcase %>
                 </div>
                 <div>
-                  <p class="text-white font-medium"><%= expense.category.titleize %></p>
+                  <p class="text-white font-medium"><%= expense.category&.name&.titleize %></p>
                   <p class="text-sm text-gray-400">
                     <%= expense.user.display_name %> • <%= expense.spent_on.strftime("%b %d, %Y") %>
                     <% if expense.fund.present? %>
