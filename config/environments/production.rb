@@ -82,9 +82,11 @@ Rails.application.configure do
   # Enable DNS rebinding protection and other `Host` header attacks.
   # Allow Render's external URL
   config.hosts = [
-    ENV["RENDER_EXTERNAL_HOSTNAME"],     # Allow requests from Render's hostname
-    /.*\.onrender\.com/,                 # Allow requests from all Render subdomains
-    "expenses.akibworks.in"              # Allow custom domain
+    ENV["RENDER_EXTERNAL_HOSTNAME"],     # Render default hostname
+    /.*\.onrender\.com/,                 # All Render subdomains
+    "expenses.akibworks.in",             # Subdomain
+    "akibworks.in",                      # ROOT domain (missing)
+    "www.akibworks.in"                   # Optional but recommended
   ].compact
 
   # Skip DNS rebinding protection for the default health check endpoint.
