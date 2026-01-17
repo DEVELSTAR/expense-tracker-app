@@ -1,0 +1,14 @@
+<div id="<%= dom_id shopping_list_item %>" class="w-full sm:w-auto my-5 space-y-5">
+  <div>
+    <strong class="block font-medium mb-1">Name:</strong>
+    <%= shopping_list_item.name %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Completed:</strong>
+    <%= shopping_list_item.completed? ? "Yes" : "No" %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">User:</strong>
+    <%= shopping_list_item.user_id %>
+  </div>
+</div>

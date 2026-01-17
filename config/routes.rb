@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :shopping_list_items do
+    patch :toggle, on: :member
+  end
   resources :categories
   # Authentication
   # Authentication
