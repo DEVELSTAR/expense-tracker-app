@@ -8,12 +8,13 @@ class User < ApplicationRecord
   attr_accessor :guardian_uid_input
 
   # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  # :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable, :confirmable
 
   # Associations
   has_many :expenses, dependent: :destroy
+  has_many :recurring_expenses, dependent: :destroy
   has_many :fund_users, dependent: :destroy
   has_many :funds, through: :fund_users
   has_many :managed_funds, class_name: "Fund", foreign_key: :admin_id, dependent: :destroy

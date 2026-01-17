@@ -10,14 +10,22 @@
       <% end %>
       <div>
         <h1 class="page-title"><%= @fund.name %></h1>
-        <p class="page-subtitle">Managed by You</p>
+        <p class="page-subtitle">
+          <% if @can_edit %>
+            Managed by You
+          <% else %>
+            Created by <%= @fund.admin.display_name %>
+          <% end %>
+        </p>
       </div>
     </div>
-    <div class="flex gap-3">
-      <%= link_to edit_fund_path(@fund), class: "btn-secondary" do %>
-        Edit Fund
-      <% end %>
-    </div>
+    <% if @can_edit %>
+      <div class="flex gap-3">
+        <%= link_to edit_fund_path(@fund), class: "btn-secondary" do %>
+          Edit Fund
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
   <%# Overview Cards %>
@@ -54,6 +62,66 @@
     </div>
   </div>
 
+  <%# Assigned Users (Only for fund owner) %>
+  <% if @can_edit %>
+    <div class="card p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-white">Assigned Users</h3>
+        <% available_users = [current_user] + current_user.dependents - @fund.users %>
+        <% if available_users.any? %>
+          <%= link_to new_guardian_fund_fund_assignment_path(@fund), class: "btn-primary btn-sm" do %>
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+            Assign User
+          <% end %>
+        <% end %>
+      </div>
+      
+      <div class="space-y-3">
+        <% @fund.fund_users.includes(:user).each do |fund_user| %>
+          <div class="flex items-center justify-between p-4 rounded-xl bg-dark-surface-elevated">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br <%= fund_user.user_id == current_user.id ? 'from-emerald-500 to-teal-500' : 'from-blue-500 to-indigo-500' %> flex items-center justify-center text-white font-bold">
+                <%= fund_user.user.display_name.first.upcase %>
+              </div>
+              <div>
+                <p class="text-white font-medium">
+                  <%= fund_user.user.display_name %>
+                  <% if fund_user.user_id == current_user.id %>
+                    <span class="text-xs text-emerald-400">(You)</span>
+                  <% end %>
+                </p>
+                <p class="text-sm text-gray-400"><%= fund_user.user.email %></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right mr-4">
+                <p class="text-sm text-primary-400">₹<%= number_with_precision(@fund.spent_by_user(fund_user.user), precision: 0, delimiter: ",") %></p>
+                <p class="text-xs text-gray-500">spent</p>
+              </div>
+              <% unless fund_user.user_id == current_user.id %>
+                <%= button_to guardian_fund_assignment_path(fund_user), 
+                    method: :delete, 
+                    class: "p-2 text-gray-400 hover:text-red-400 hover:bg-dark-border rounded-lg transition-colors",
+                    data: { turbo_confirm: "Remove #{fund_user.user.display_name} from this fund?" },
+                    title: "Remove from fund" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @fund.users.empty? %>
+        <p class="text-gray-500 text-center py-4">No users assigned to this fund yet.</p>
+      <% end %>
+    </div>
+  <% end %>
+
   <%# Recent Expenses %>
   <div class="card">
     <div class="p-6 border-b border-dark-border flex items-center justify-between">
@@ -74,7 +142,9 @@
             </div>
             <div class="text-right">
               <p class="font-semibold text-red-400">-₹<%= number_with_precision(expense.amount, precision: 2, delimiter: ",") %></p>
-              <%= link_to "View", expense_path(expense), class: "text-xs text-primary-400 hover:text-primary-300" %>
+              <% if expense.user_id == current_user.id || (current_user.guardian? && current_user.dependents.include?(expense.user)) %>
+                <%= link_to "View", expense_path(expense), class: "text-xs text-primary-400 hover:text-primary-300" %>
+              <% end %>
             </div>
           </div>
         <% end %>

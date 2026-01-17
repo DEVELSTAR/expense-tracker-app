@@ -4,6 +4,12 @@ class Expense < ApplicationRecord
   belongs_to :user
   belongs_to :fund, optional: true
 
+  # Receipt attachment
+  has_one_attached :receipt
+
+  # Validate receipt file type and size
+  validate :acceptable_receipt
+
   # Predefined categories
   CATEGORIES = %w[groceries rent travel shopping bills other].freeze
 
@@ -32,16 +38,35 @@ class Expense < ApplicationRecord
     fund&.name || "Personal"
   end
 
+  def has_receipt?
+    receipt.attached?
+  end
+
   private
 
   def amount_within_fund_balance
     return unless fund.present? && amount.present?
-    
+
     existing_amount = persisted? ? amount_was : 0
     available = fund.remaining_balance + existing_amount
-    
+
     if amount > available
       errors.add(:amount, "exceeds available fund balance (₹#{format('%.2f', available)} available)")
+    end
+  end
+
+  def acceptable_receipt
+    return unless receipt.attached?
+
+    # Check file size (max 5MB)
+    if receipt.blob.byte_size > 5.megabytes
+      errors.add(:receipt, "is too large (maximum 5MB)")
+    end
+
+    # Check file type
+    acceptable_types = [ "image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf" ]
+    unless acceptable_types.include?(receipt.blob.content_type)
+      errors.add(:receipt, "must be an image (JPEG, PNG, GIF, WebP) or PDF")
     end
   end
 end

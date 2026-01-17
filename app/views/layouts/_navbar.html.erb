@@ -9,19 +9,85 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </div>
-          <span>ExpenseTracker</span>
+          <span class="hidden sm:inline">ExpenseTracker</span>
         <% end %>
       </div>
 
       <%# Navigation Links %>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2 sm:gap-4">
         <% if user_signed_in? %>
           <% if current_user.admin? %>
-            <%# Admin Navigation - No Home Icon needed %>
+            <%# Admin Navigation %>
+            <%= link_to admin_users_path, class: "nav-link hidden sm:flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              <span class="hidden md:inline">Users</span>
+            <% end %>
+            <%= link_to admin_funds_path, class: "nav-link hidden sm:flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+              <span class="hidden md:inline">Funds</span>
+            <% end %>
+
+          <% elsif current_user.guardian? %>
+            <%# Guardian Navigation %>
+            <%= link_to root_path, class: "nav-link hidden sm:flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+              <span class="hidden md:inline">Dashboard</span>
+            <% end %>
+            <%= link_to funds_path, class: "nav-link hidden sm:flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="hidden md:inline">Funds</span>
+            <% end %>
+            <%= link_to guardian_dependents_path, class: "nav-link hidden sm:flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              <span class="hidden md:inline">Dependents</span>
+            <% end %>
+            <%= link_to expenses_path, class: "nav-link hidden sm:flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              <span class="hidden md:inline">Expenses</span>
+            <% end %>
+
+            <%# Add Expense Button %>
+            <%= link_to new_expense_path, class: "btn-primary btn-sm inline-flex items-center gap-2", style: "border-radius: 12px;" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              <span class="hidden sm:inline">Add Expense</span>
+            <% end %>
+
           <% else %>
-            <%# User Navigation - No Home Icon needed %>
+            <%# Dependent Navigation %>
+            <%= link_to root_path, class: "nav-link hidden sm:flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+              <span class="hidden md:inline">Dashboard</span>
+            <% end %>
+            <%= link_to funds_path, class: "nav-link hidden sm:flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="hidden md:inline">My Funds</span>
+            <% end %>
+            <%= link_to expenses_path, class: "nav-link hidden sm:flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              <span class="hidden md:inline">Expenses</span>
+            <% end %>
 
-
+            <%# Add Expense Button %>
             <%= link_to new_expense_path, class: "btn-primary btn-sm inline-flex items-center gap-2", style: "border-radius: 12px;" do %>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -32,7 +98,7 @@
 
           <%# Profile Link %>
           <%= link_to profile_path, class: "flex items-center gap-2 ml-2 p-2 rounded-xl hover:bg-dark-surface-elevated transition-colors" do %>
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-sm font-bold">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br <%= current_user.admin? ? 'from-red-500 to-orange-500' : current_user.guardian? ? 'from-emerald-500 to-teal-500' : 'from-blue-500 to-indigo-500' %> flex items-center justify-center text-white text-sm font-bold">
               <%= current_user.display_name.first.upcase %>
             </div>
             <div class="hidden sm:block text-left">
@@ -50,10 +116,60 @@
             </div>
           <% end %>
         <% else %>
-          <%= link_to "Sign In", new_user_session_path, class: "nav-link" %>
+          <%= link_to "Sign In", new_user_session_path, class: "nav-link text-gray-400 hover:text-white" %>
           <%= link_to "Sign Up", new_user_registration_path, class: "btn-primary btn-sm", style: "border-radius: 12px;" %>
         <% end %>
       </div>
     </div>
   </div>
 </nav>
+
+<%# Mobile Bottom Navigation (for logged in users) %>
+<% if user_signed_in? && !current_user.admin? %>
+  <nav class="fixed bottom-0 left-0 right-0 z-50 sm:hidden glass border-t border-dark-border">
+    <div class="flex items-center justify-around h-16 px-4">
+      <%= link_to root_path, class: "flex flex-col items-center gap-1 px-3 py-2 rounded-lg hover:bg-dark-surface-elevated transition-colors #{current_page?(root_path) ? 'text-primary-400' : 'text-gray-400'}" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span class="text-xs">Home</span>
+      <% end %>
+      
+      <%= link_to funds_path, class: "flex flex-col items-center gap-1 px-3 py-2 rounded-lg hover:bg-dark-surface-elevated transition-colors #{current_page?(funds_path) ? 'text-primary-400' : 'text-gray-400'}" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="text-xs">Funds</span>
+      <% end %>
+      
+      <%= link_to new_expense_path, class: "flex items-center justify-center w-14 h-14 -mt-6 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-white shadow-lg shadow-primary-500/30" do %>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+      <% end %>
+      
+      <% if current_user.guardian? %>
+        <%= link_to guardian_dependents_path, class: "flex flex-col items-center gap-1 px-3 py-2 rounded-lg hover:bg-dark-surface-elevated transition-colors #{current_page?(guardian_dependents_path) ? 'text-primary-400' : 'text-gray-400'}" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          <span class="text-xs">Dependents</span>
+        <% end %>
+      <% else %>
+        <%= link_to expenses_path, class: "flex flex-col items-center gap-1 px-3 py-2 rounded-lg hover:bg-dark-surface-elevated transition-colors #{current_page?(expenses_path) ? 'text-primary-400' : 'text-gray-400'}" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          <span class="text-xs">Expenses</span>
+        <% end %>
+      <% end %>
+      
+      <%= link_to profile_path, class: "flex flex-col items-center gap-1 px-3 py-2 rounded-lg hover:bg-dark-surface-elevated transition-colors #{current_page?(profile_path) ? 'text-primary-400' : 'text-gray-400'}" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        <span class="text-xs">Profile</span>
+      <% end %>
+    </div>
+  </nav>
+<% end %>

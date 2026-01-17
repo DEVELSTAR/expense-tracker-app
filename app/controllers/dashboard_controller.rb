@@ -30,6 +30,12 @@ class DashboardController < ApplicationController
     @personal_funds = all_funds.select { |f| f.admin_id == current_user.id }
     @assigned_funds = all_funds.select { |f| f.admin_id != current_user.id }
 
+    # Find funds that need attention (low balance)
+    @funds_needing_attention = all_funds.select do |fund|
+      spent_percent = fund.amount > 0 ? (fund.total_spent / fund.amount * 100) : 0
+      spent_percent >= 75 || fund.remaining_balance <= 0
+    end
+
     # For guardians, show dependents overview
     if current_user.guardian?
       @dependents = current_user.dependents.includes(:expenses)

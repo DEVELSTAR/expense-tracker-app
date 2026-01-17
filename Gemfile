@@ -18,6 +18,8 @@ gem "stimulus-rails"
 gem "tailwindcss-rails"
 # Authentication [https://github.com/heartcombo/devise]
 gem "devise"
+# Rate limiting and request throttling [https://github.com/rack/rack-attack]
+gem "rack-attack"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
@@ -62,4 +64,6 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  # Preview emails in the browser instead of sending [https://github.com/ryanb/letter_opener]
+  gem "letter_opener"
 end

@@ -4,76 +4,182 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">My Funds</h1>
-      <p class="page-subtitle">Manage your personal funds and budgets</p>
-    </div>
-    <%= link_to new_fund_path, class: "btn-primary btn-lg inline-flex items-center gap-2" do %>
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-      </svg>
-      <span>Create Personal Fund</span>
-    <% end %>
-  </div>
-
-  <% if @funds.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <% @funds.each do |fund| %>
-        <div class="card p-6 flex flex-col h-full hover:border-primary-500/30 transition-colors">
-          <div class="flex items-start justify-between mb-4">
-            <div>
-              <h3 class="text-xl font-bold text-white"><%= fund.name %></h3>
-              <p class="text-sm text-gray-400">Created <%= time_ago_in_words(fund.created_at) %> ago</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <%= link_to edit_fund_path(fund), class: "p-2 hover:bg-dark-surface-elevated rounded-lg transition-colors text-gray-400 hover:text-white" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-              <% end %>
-              <%= button_to fund_path(fund), method: :delete, class: "p-2 hover:bg-dark-surface-elevated rounded-lg transition-colors text-gray-400 hover:text-red-400", data: { turbo_confirm: "Are you sure? This will delete the fund and unlink all expenses." } do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-              <% end %>
-            </div>
-          </div>
-
-          <div class="mt-auto space-y-4">
-            <div>
-              <div class="flex items-end justify-between mb-2">
-                <span class="text-gray-400">Total Budget</span>
-                <span class="text-xl font-bold text-white">₹<%= number_with_precision(fund.amount, precision: 0, delimiter: ",") %></span>
-              </div>
-              
-              <% spent_percent = fund.amount > 0 ? (fund.total_spent / fund.amount * 100).clamp(0, 100) : 0 %>
-              <div class="w-full h-2 bg-dark-surface-elevated rounded-full overflow-hidden">
-                <div class="h-full rounded-full <%= spent_percent > 90 ? 'bg-red-500' : spent_percent > 60 ? 'bg-yellow-500' : 'bg-green-500' %>" style="width: <%= spent_percent %>%"></div>
-              </div>
-              
-              <div class="flex justify-between text-xs mt-2">
-                <span class="text-red-400">Spent: ₹<%= number_with_precision(fund.total_spent, precision: 0, delimiter: ",") %></span>
-                <span class="text-green-400">Left: ₹<%= number_with_precision(fund.remaining_balance, precision: 0, delimiter: ",") %></span>
-              </div>
-            </div>
-            
-            <%= link_to fund_path(fund), class: "btn-secondary w-full justify-center" do %>
-              View Details
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-    </div>
-  <% else %>
-    <div class="empty-state">
-      <div class="empty-state-icon">🏦</div>
-      <h3 class="empty-state-title">No Funds Created</h3>
-      <p class="empty-state-description">
-        Create a personal fund to manage specific budgets like "Travel", "Renovation", or "Emergency".
+      <p class="page-subtitle">
+        <% if current_user.guardian? %>
+          Manage your funds and budgets
+        <% else %>
+          View your assigned funds
+        <% end %>
       </p>
-      <%= link_to new_fund_path, class: "btn-primary inline-flex items-center gap-2" do %>
+    </div>
+    <% if current_user.guardian? %>
+      <%= link_to new_fund_path, class: "btn-primary btn-lg inline-flex items-center gap-2" do %>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
-        <span>Create Personal Fund</span>
+        <span>Create Fund</span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# My Created Funds (Guardians Only) %>
+  <% if current_user.guardian? && @managed_funds.any? %>
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+        </svg>
+        My Created Funds
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @managed_funds.each do |fund| %>
+          <div class="card p-6 flex flex-col h-full hover:border-emerald-500/30 transition-colors">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <h3 class="text-xl font-bold text-white"><%= fund.name %></h3>
+                <p class="text-sm text-gray-400">Created <%= time_ago_in_words(fund.created_at) %> ago</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <%= link_to edit_fund_path(fund), class: "p-2 hover:bg-dark-surface-elevated rounded-lg transition-colors text-gray-400 hover:text-white" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                <% end %>
+                <%= button_to fund_path(fund), method: :delete, class: "p-2 hover:bg-dark-surface-elevated rounded-lg transition-colors text-gray-400 hover:text-red-400", data: { turbo_confirm: "Are you sure? This will delete the fund and unlink all expenses." } do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                <% end %>
+              </div>
+            </div>
+
+            <%# Assigned Users %>
+            <div class="mb-4">
+              <p class="text-xs text-gray-500 mb-2">Assigned to:</p>
+              <div class="flex flex-wrap gap-1">
+                <% fund.users.each do |user| %>
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs <%= user.id == current_user.id ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400' %>">
+                    <%= user.display_name %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="mt-auto space-y-4">
+              <div>
+                <div class="flex items-end justify-between mb-2">
+                  <span class="text-gray-400">Total Budget</span>
+                  <span class="text-xl font-bold text-white">₹<%= number_with_precision(fund.amount, precision: 0, delimiter: ",") %></span>
+                </div>
+                
+                <% spent_percent = fund.amount > 0 ? (fund.total_spent / fund.amount * 100).clamp(0, 100) : 0 %>
+                <div class="w-full h-2 bg-dark-surface-elevated rounded-full overflow-hidden">
+                  <div class="h-full rounded-full <%= spent_percent > 90 ? 'bg-red-500' : spent_percent > 60 ? 'bg-yellow-500' : 'bg-green-500' %>" style="width: <%= spent_percent %>%"></div>
+                </div>
+                
+                <div class="flex justify-between text-xs mt-2">
+                  <span class="text-red-400">Spent: ₹<%= number_with_precision(fund.total_spent, precision: 0, delimiter: ",") %></span>
+                  <span class="text-green-400">Left: ₹<%= number_with_precision(fund.remaining_balance, precision: 0, delimiter: ",") %></span>
+                </div>
+              </div>
+              
+              <%= link_to fund_path(fund), class: "btn-secondary w-full justify-center" do %>
+                View Details
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Assigned Funds %>
+  <% if @assigned_funds.any? %>
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <% if current_user.guardian? %>
+          Funds Assigned to Me
+        <% else %>
+          My Assigned Funds
+        <% end %>
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @assigned_funds.each do |fund| %>
+          <div class="card p-6 flex flex-col h-full hover:border-blue-500/30 transition-colors">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <h3 class="text-xl font-bold text-white"><%= fund.name %></h3>
+                <p class="text-sm text-gray-400">By <%= fund.admin.display_name %></p>
+              </div>
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-500/20 text-blue-400">
+                Assigned
+              </span>
+            </div>
+
+            <div class="mt-auto space-y-4">
+              <div>
+                <div class="flex items-end justify-between mb-2">
+                  <span class="text-gray-400">Available</span>
+                  <span class="text-xl font-bold text-secondary-400">₹<%= number_with_precision(fund.remaining_balance, precision: 0, delimiter: ",") %></span>
+                </div>
+                
+                <% spent_percent = fund.amount > 0 ? (fund.total_spent / fund.amount * 100).clamp(0, 100) : 0 %>
+                <div class="w-full h-2 bg-dark-surface-elevated rounded-full overflow-hidden">
+                  <div class="h-full rounded-full bg-gradient-to-r from-primary-500 to-secondary-500" style="width: <%= spent_percent %>%"></div>
+                </div>
+                
+                <div class="flex justify-between text-xs mt-2">
+                  <span class="text-gray-500"><%= spent_percent.round %>% used</span>
+                  <span class="text-gray-500">₹<%= number_with_precision(fund.amount, precision: 0, delimiter: ",") %> total</span>
+                </div>
+              </div>
+              
+              <%= link_to fund_path(fund), class: "btn-secondary w-full justify-center" do %>
+                View Details
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Empty State %>
+  <% if @managed_funds.empty? && @assigned_funds.empty? %>
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <% if current_user.guardian? %>
+          🏦
+        <% else %>
+          💰
+        <% end %>
+      </div>
+      <h3 class="empty-state-title">
+        <% if current_user.guardian? %>
+          No Funds Created
+        <% else %>
+          No Funds Assigned
+        <% end %>
+      </h3>
+      <p class="empty-state-description">
+        <% if current_user.guardian? %>
+          Create a fund to manage specific budgets like "Groceries", "Travel", or "Emergency".
+        <% else %>
+          Your guardian hasn't assigned any funds to you yet. Contact them to get access to spending funds.
+        <% end %>
+      </p>
+      <% if current_user.guardian? %>
+        <%= link_to new_fund_path, class: "btn-primary inline-flex items-center gap-2" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span>Create Fund</span>
+        <% end %>
       <% end %>
     </div>
   <% end %>
