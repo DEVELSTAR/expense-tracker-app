@@ -9,7 +9,7 @@ class Admin::DashboardController < ApplicationController
     @funds_count = Fund.count
     @total_fund_amount = Fund.sum(:amount)
     @total_expenses = Expense.sum(:amount)
-    
+
     @recent_funds = Fund.includes(:users).order(created_at: :desc).limit(5)
     @recent_expenses = Expense.includes(:user, :fund).recent.limit(10)
   end

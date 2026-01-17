@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   }
 
   # Onboarding
-  resources :onboarding, only: [:index] do
+  resources :onboarding, only: [ :index ] do
     collection do
       post :become_guardian
       post :become_dependent

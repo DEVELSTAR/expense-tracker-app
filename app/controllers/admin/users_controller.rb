@@ -22,6 +22,7 @@ class Admin::UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
+    @user.role = params[:user][:role]
     @user.password = user_params[:password]
     @user.password_confirmation = user_params[:password_confirmation]
 
@@ -37,6 +38,7 @@ class Admin::UsersController < ApplicationController
 
   def update
     update_params = user_params.reject { |_, v| v.blank? }
+    update_params[:role] = params[:user][:role] if params[:user][:role].present?
 
     # If password fields are blank, don't update password
     if update_params[:password].blank?
@@ -84,7 +86,7 @@ class Admin::UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :password, :password_confirmation, :role, :guardian_id)
+    params.require(:user).permit(:name, :email, :password, :password_confirmation, :guardian_id)
   end
 
   def require_admin!
