@@ -1,0 +1,67 @@
+<% content_for :title, "Manage Expenses - Admin" %>
+
+<div class="animate-fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Manage Expenses</h1>
+      <p class="page-subtitle">View and manage all user expenses</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Fund</th>
+            <th>Date</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @expenses.each do |expense| %>
+            <tr>
+              <td>
+                <div class="text-white font-medium"><%= expense.user.name %></div>
+                <div class="text-gray-400 text-sm"><%= expense.user.email %></div>
+              </td>
+              <td>
+                <span class="text-red-400 font-semibold">
+                  -<%= number_to_currency(expense.amount, unit: "₹") %>
+                </span>
+              </td>
+              <td>
+                <span class="badge badge-gray">
+                  <%= expense.category&.name&.capitalize || "Uncategorized" %>
+                </span>
+              </td>
+              <td class="text-gray-400">
+                <%= expense.fund&.name || "Personal" %>
+              </td>
+              <td class="text-gray-500">
+                <%= expense.spent_on.strftime("%b %d, %Y") %>
+              </td>
+              <td class="text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <%= link_to edit_admin_expense_path(expense), class: "btn-ghost btn-sm" do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  <% end %>
+                  <%= button_to admin_expense_path(expense), method: :delete, class: "btn-ghost btn-sm text-red-400 hover:text-red-300", form: { data: { turbo_confirm: "Are you sure? This cannot be undone." } } do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
