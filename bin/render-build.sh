@@ -18,7 +18,10 @@ bundle exec rails assets:clean
 bundle exec rails db:migrate
 
 # Optionally seed the database on first deploy
-# Uncomment the following lines if you want to seed on deploy:
-if [ "$RENDER_EXTERNAL_URL" ]; then
+# Seed the database if SEED_DATABASE is set
+if [ "$SEED_DATABASE" = "true" ]; then
+  echo "🌱 Seeding database..."
   bundle exec rails db:seed
+else
+  echo "⏩ Skipping seed (SEED_DATABASE env var not set to 'true')"
 fi
