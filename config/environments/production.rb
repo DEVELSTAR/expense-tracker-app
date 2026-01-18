@@ -67,7 +67,10 @@ Rails.application.configure do
 
   # Set host to be used by links generated in mailer templates.
   # This will be overridden by RENDER_EXTERNAL_URL if available
-  config.action_mailer.default_url_options = { host: ENV.fetch("RENDER_EXTERNAL_URL", "example.com").gsub(/^https?:\/\//, "") }
+  # config.action_mailer.default_url_options = { host: ENV.fetch("RENDER_EXTERNAL_URL", "example.com").gsub(/^https?:\/\//, "") }
+  config.action_mailer.default_url_options = {
+    protocol: "https"
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
